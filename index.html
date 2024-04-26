@@ -1,29 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width">
-            <title></title>
 
-        <!--put your external stylesheet links here-->
-        <link rel="stylesheet" href="css/style.css">
-        <!--[if IE<9]>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title></title>
+
+    <!--put your external stylesheet links here-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="./lib/leaflet/leaflet.css">
+    <link rel="stylesheet" href="./lib/leaflet-search/leaflet-search.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.control.min.css" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Cairo+Play:wght@200..1000&family=Honk:MORF,SHLN@34,73.9&family=Nabla:EDPT,EHLT@171,16&family=Protest+Revolution&family=Reem+Kufi+Fun:wght@400..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--[if IE<9]>
             <link rel="stylesheet" href="css/style.ie.css">
         <![endif]-->
+</head>
 
-         <!--you can also place internal styles here;
-             place these within <style> tags-->
-        
-    </head>
+<body>
+    <!-- Splash Screen Welcome Modal -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-modal">
+            <div class="welcome-message">
+                <h1>Welcome to Ignite Insights!</h1>
+                <h3>Uncover Your Community's Wildfire Story</h3>
+                <p>Whether you're settling into a new area or nurturing a long-standing connection
+                    to your community, understanding wildfire risks is crucial. Ignite Insights
+                    equips you with the tools to delve into historical data and analyze the factors
+                    that influence wildfire dynamics across regions.</p>
+                <h4>What You'll Discover:</h4>
+                <ul>
+                    <li>
+                        <b>Fire Trends Over Time:</b> Utilize our time slider to examine changes in
+                        wildfire intensity and area over the years. Identify trends and prepare
+                        better for future risks.
+                    </li>
+                    <li>
+                        <b>Population and Development Impacts:</b> Our maps illustrate how changes
+                        in population density and urban development correlate with increased
+                        wildfire risks. See the bigger picture of how human activities intertwine
+                        with natural phenomena.
+                    </li>
+                    <li>
+                        <b>Protecting Communities and Nature:</b> Explore which areas face
+                        heightened risks due to socio-economic factors and how these risks impact
+                        both human and wildlife habitats.
+                    </li>
+                </ul>
+                <h4>Are you ready to turn insights into informed actions?</h4>
+                <!-- Continue button -->
+                <button id="close-splash">Start Your Exploration</button>
+            </div>
+        </div>
+    </div>
+    <div id="map-container">
+        <div id="popup-content" style="display: none;"></div>
+        <div id="slider-container">
+            <div id="slider" class="slider">
+                <p id="rangeValue"></p>
+                <button class="button" id="reverse"><svg xmlns="http://www.w3.org/2000/svg"
+                        width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                    </svg></button>
+                <input class='range' id="range" type='range' min="0" max="8" step="1">
+                <button class="button" id="forward"><svg xmlns="http://www.w3.org/2000/svg"
+                        width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+                    </svg></i></button>
+            </div>
+            <div id="wildfire-total">Total Wildfire Count for <span
+                    id="selected-year">1984</span>: <span id="total-count"> 0</span></div>
+        </div>
+        <div class="legend-container">
+            <div id="legend-title">Legend</div>
+            <div id="legend" class="legend">
+            </div>
+        </div>
+    </div>
+    <!-- Side Panel   -->
+    <div id="side-panel-container">
+        <div id="map-description">
+            <section id="Welcome">
+                <h2>How to Navigate Ignite Insights</h2>
+                <p>Welcome to your interactive guide to understanding wildfires and their impacts.
+                    Our platform is designed to visually connect you with extensive wildfire data as
+                    you explore the content in our side panel. Here’s how to get the most out of
+                    Ignite Insights:</p>
+                <br>
+                <ul>
+                    <li><strong>Interactive Map & Side Panel Sync:</strong> As you scroll through
+                        the sections on the right, the map on the left will dynamically update to
+                        reflect the information and data ranges you’re reading about. This
+                        synchronized interaction helps you see the real-time impact of the data
+                        being discussed.</li></br>
+                    <li><strong>Exploring Wildfire History:</strong> Scroll to ‘Wildfire History’:
+                        As you read about changes in wildfire trends over the years, the map will
+                        display the boundaries of historical wildfires from 1984 to 2022. Use the
+                        time slider below the map to adjust the years and observe changes directly.
+                    </li></br>
+                    <li><strong>Understanding WUI Expansion:</strong>Move to the ‘WUI Data’ Section:
+                        When you reach this topic, the map will shift to show the Wildland-Urban
+                        Interface data, illustrating how these boundaries have expanded over time.
+                    </li></br>
 
-    <body>
-        <!--put your initial page content here-->
+                    <li><strong>Navigation Controls:</strong>Use the panel on the right to navigate
+                        through topics. The map will automatically adjust to show the relevant data
+                        as you move between sections.</li>
+                </ul>
+                <p>Start your journey by scrolling down and watch as Ignite Insights brings data to
+                    life, right before your eyes!</p>
 
-        <!--you can also use this space for internal scripts;
-        place these within <script> tags-->
+            </section>
+            <section id="wildfire-history">
+                <h2>Wildfire History</h2>
+                <p>Early Records and Observations: Historically, wildfires have always been a
+                    natural part of the ecosystems in the Western United States, particularly in
+                    areas dominated by forests and shrublands adapted to fire. Indigenous peoples
+                    used fire as a land management tool for thousands of years, influencing fire
+                    regimes in significant ways.
+                    <br><br><b>20th Century:</b> With the establishment of modern fire suppression
+                    policies in the early 20th century, particularly after devastating events like
+                    the 1910 "Big Blowup" which burned about 3 million acres across Idaho, Montana,
+                    and Washington, the approach to wildfires shifted dramatically. The U.S.
+                    government began a policy of aggressive fire suppression, which reduced the
+                    number of fires in the short term but also led to an accumulation of undergrowth
+                    and dead wood, which are significant fuels for fires.
+                    <br><br><b>Late 20th Century to Present:</b> From the 1980s onward, there has
+                    been a noticeable increase in the number and size of wildfires. Research
+                    indicates that this change is driven by a combination of factors including past
+                    fire suppression policies, increased human settlement in fire-prone areas
+                    (urban-wildland interface), and climate change impacts such as warmer
+                    temperatures, earlier snowmelt, and longer dry seasons.
+                </p>
+                <h2>LOREM IPSUM</h2>
+                <p>Early Records and Observations: Historically, wildfires have always been a
+                    natural part of the ecosystems in the Western United States, particularly in
+                    areas dominated by forests and shrublands adapted to fire. Indigenous peoples
+                    used fire as a land management tool for thousands of years, influencing fire
+                    regimes in significant ways.
+                    <br><br><b>20th Century:</b> With the establishment of modern fire suppression
+                    policies in the early 20th century, particularly after devastating events like
+                    the 1910 "Big Blowup" which burned about 3 million acres across Idaho, Montana,
+                    and Washington, the approach to wildfires shifted dramatically. The U.S.
+                    government began a policy of aggressive fire suppression, which reduced the
+                    number of fires in the short term but also led to an accumulation of undergrowth
+                    and dead wood, which are significant fuels for fires.
+                    <br><br><b>Late 20th Century to Present:</b> From the 1980s onward, there has
+                    been a noticeable increase in the number and size of wildfires. Research
+                    indicates that this change is driven by a combination of factors including past
+                    fire suppression policies, increased human settlement in fire-prone areas
+                    (urban-wildland interface), and climate change impacts such as warmer
+                    temperatures, earlier snowmelt, and longer dry seasons.
+                </p>
+            </section>
+            <section id="wui">
+                <h2>Definition and Importance of WUI</h2>
+                <p>The Wildland-Urban Interface (WUI) is defined as areas where human-made
+                    structures and infrastructure (homes, businesses, etc.) are in or adjacent to
+                    areas prone to wildland fire. This interface has become a focal point for
+                    wildfire management because it's where human populations and infrastructure are
+                    most at risk from wildfires.</p>
+                <h4>Historical Context and Development</h4>
+                <p><br><br><b>Early Development:</b> In the early and mid-20th century, the
+                    expansion of urban areas into wildland areas was relatively limited. However, as
+                    population growth accelerated in the Western U.S., more communities began to
+                    develop in fire-prone landscapes, particularly in states like California,
+                    Colorado, and Arizona.
+                    <br><br><b>Late 20th Century:</b> By the 1980s and 1990s, there was a
+                    significant increase in the development of the WUI. This growth was driven by a
+                    desire for scenic vistas, privacy, and a closeness to nature. However, this
+                    expansion led to increased vulnerability to wildfires as more people and
+                    property were situated in areas with a high fire risk.
+                </p>
+                <h4>Trends and Changes</h4>
+                <p><br><br><b>Population Growth:</b> The population in WUI regions has continued to
+                    grow rapidly. From 1990 to 2010, the number of new homes built in WUI areas was
+                    significantly higher than in non-WUI areas, underscoring the desirability of
+                    these regions despite their risks.
+                    <br><br><b>Increasing Wildfire Risks:</b> As more people move into WUI areas,
+                    the risk of wildfires increases, not only because there are more ignition points
+                    (like vehicles, power lines, and residential activities) but also because fire
+                    suppression becomes harder. Wildfires that reach these populated areas are more
+                    challenging to manage and pose higher risks to human life and property.
+                </p>
+                <h4>Impact of WUI on Wildfire Management and Policy</h4>
+                <p>The growth of WUI areas has significant implications for wildfire management
+                    policies and practices:</p>
+                <p><br><br><b>Fire Management Practices: </b> here has been a shift towards more
+                    integrated fire management practices, including prescribed burns (controlled
+                    fires used to manage vegetation) and the creation of defensible spaces around
+                    properties.
+                    <br><br><b>Building and Zoning Regulations: </b> Many states and local
+                    governments in the Western U.S. have updated building codes and zoning
+                    regulations to improve fire resistance in WUI areas. These include requiring
+                    fire-resistant building materials and creating regulations that require
+                    homeowners to manage vegetation around their properties.
+                </p>
+            </section>
+        </div>
+    </div>
+    <button id="toggle-panel-btn">Close</button>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+        <symbol id="icon-arrow-left" viewBox="0 0 24 24">
+            <path d="M15.422 16.594 14.016 18l-6-6 6-6 1.406 1.406L10.828 12z" />
+        </symbol>
+        <symbol id="icon-clear" viewBox="0 0 24 24">
+            <path
+                d="M18.984 6.422 13.406 12l5.578 5.578-1.406 1.406L12 13.406l-5.578 5.578-1.406-1.406L10.594 12 5.016 6.422l1.406-1.406L12 10.594l5.578-5.578z" />
+        </symbol>
+        <symbol id="icon-menu" viewBox="0 0 24 24">
+            <path
+                d="M3 13h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0-6h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 12h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z" />
+        </symbol>
+    </svg>
+    <div class="sidebar" title="Map Guide">
+        <button aria-label="close sidebar" type="button" class="close-button">
+            <svg>
+                <use xlink:href="#icon-clear" />
+            </svg>
+        </button>
 
-        <!--put your external script links here-->
-        <script type="text/javascript" src="js/main.js"></script>
-        <script type="text/javascript" src="lib/jquery-3.5.1.js"></script>
-    </body>
+        <ul class="sidebar-menu">
+            <li class="menu-item" data-item="menu">
+                <svg>
+                    <use xlink:href="#icon-menu"></use>
+                </svg>
+            </li>
+        </ul>
+        <div class="sidebar-content">
+            <div class="item-content" id="menu">
+                <h1 class="main-title">Explore Vandalism Trends Through Time</h1>
+                <br class="content">
+                <h2>Map Navigation Guide</h2>
+                <br>
+                <p>Welcome to the Ignite Insights interactive map, designed to provide you with a
+                    view of
+                    trends across Portland neighborhoods from 2015 to 2023. Here's how to navigate
+                    the map:</p>
+                <br>
+                <li><strong>Explore by time:</strong> Use the scroll bar at the bottom of the map
+                    to travel through years of data, from 2015 to 2023. As
+                    you change the year, notice how the map visualization, legend, and neighborhood
+                    information pane
+                    automatically update to reflect vandalism trends of the selected year.</li></br>
+                <li><strong>Explore specific neighborhood data:</strong> Click on the individual
+                    neighborhood points to see detailed information about annual vandalism
+                    counts in that area. To see the neighborhood name, simply click within the
+                    neighborhood boundary.
+                </li></br>
+                <li><strong>Search by neighborhood:</strong>Click on the search icon under the zoom
+                    controls on the upper left corner of the map to find and
+                    zoom to a specific neighborhood.</li></br>
+                <li><strong>Use the zoom controls:</strong> Zoom in or out or pan through the data
+                    to get a closer look at specific neighborhoods.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!--external script links -->
+    <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> -->
+    <script type="text/javascript" src="./lib/leaflet/leaflet-src.js"></script>
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    <script type="text/javascript" src="./lib/leaflet-search/leaflet-search.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
+    <script type="text/javascript" defer src="./js/main.js"></script>
+</body>
+
 </html>
