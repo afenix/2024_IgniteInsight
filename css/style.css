@@ -95,17 +95,58 @@ html {
 /* Splash Screen  */
 /* ================================================================================== */
 
+/* CSS for fading in the splash screen */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.splash-screen.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+.header-container {
+    display: inline-flex; /* Use inline-flex instead of flex */
+    align-items: center;  /* Maintain vertical alignment */
+}
+
+#splash-welcome {
+    color: #E85D04;
+    font-size: 36px;
+}
+
 .splash-screen {
+    display: none;  /* Start hidden and toggle this with JavaScript */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    z-index: 2000; /* Ensure it's above other content */
+    animation: fadeIn 1s ease-out forwards; /* Apply the animation */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    background-image: url('../img/DALLE-fire2.jpg'); /* Path to your background image */
+    background-size: cover; /* Cover the entire area of the modal */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    height: 100%; /* Ensure the div takes up the full height of its container */
+    width: 100%; /* Ensure the div takes up the full width of its container */
 }
 
 .splash-modal {
@@ -154,6 +195,13 @@ html {
     cursor: pointer;
     text-align: center;
 }
+
+/* Style for the button on hover */
+#close-splash:hover {
+    background-color: #E85D04;
+    color: white; /* Example: Darker green on hover */
+    /*background-image: url("https://media.giphy.com/media/Lopx9eUi34rbq/giphy.gif"); /* Direct URL to the GIF */
+  }
 
 /* ================================================================================== */
 /* Map Description Sidepanel  */

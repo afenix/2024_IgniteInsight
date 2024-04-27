@@ -33,8 +33,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add event listener to close the splash screen when the close button is clicked
     closeButton.addEventListener('click', function () {
-        splashScreen.style.display = 'none';
+        // Add the fade-out class to start the animation
+        splashScreen.classList.add('fade-out');
+        // Wait for the animation to finish before setting display to 'none'
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+        }, 500); // Duration of the fade-out animation
     });
+
     // Attach the event listener to the toggle button and fire the toggle function when the close button is clicked
     toggleBtn.addEventListener('click', toggleSidePanelAndAdjustMap);
 
