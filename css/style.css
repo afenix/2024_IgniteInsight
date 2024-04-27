@@ -35,6 +35,62 @@ html {
         "SHLN" 73.9;
 }
 
+
+.leaflet-control-custom.home-button {
+    margin-left: 11px !important;
+    font-family: "Reem Kufi Fun", sans-serif !important;
+}
+
+.leaflet-control-custom.home-button:hover {
+    margin-left: 11px !important;
+    background-color: #e8e7e3 !important;
+}
+
+.leaflet-control-custom.home-button[data-tooltip]::after { /* This targets the tooltip itself */
+    content: attr(data-tooltip);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    position: absolute;
+    opacity: 0;          /* Make tooltip initially invisible */
+    transition: opacity 0.3s; /* Add a transition for a smooth effect */
+    margin: 0 0 0 120px !important;
+}
+
+.leaflet-control-custom.home-button:hover[data-tooltip]::after {
+    opacity: 1; /* Show the tooltip on hover */
+    margin: 0 0 0 120px !important;
+}
+
+
+.leaflet-control-custom.region-button {
+    margin-left: 11px !important;
+    font-family: "Reem Kufi Fun", sans-serif !important;
+}
+
+.leaflet-control-custom.region-button:hover {
+    background-color: #e8e7e3 !important;
+}
+
+.leaflet-control-custom.region-button[data-tooltip]::after { /* This targets the tooltip itself */
+    content: attr(data-tooltip);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    position: absolute;
+    opacity: 0;          /* Make tooltip initially invisible */
+    transition: opacity 0.3s; /* Add a transition for a smooth effect */
+    margin: 0 0 0 120px !important;
+}
+
+.leaflet-control-custom.region-button:hover[data-tooltip]::after {
+    opacity: 1; /* Show the tooltip on hover */
+    margin: 0 0 0 120px !important;
+}
+
+
+
+
 /* ================================================================================== */
 /* Splash Screen  */
 /* ================================================================================== */

@@ -74,6 +74,73 @@ const createMap = (containerId, center, zoom) => {
         zoom: zoom, // Initial zoom level
     });
 
+    // Create a new control that adds the home button to the map
+    L.Control.HomeButton = L.Control.extend({
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom home-button');
+            // Style Home button - use Font Awesome's home icon
+            container.innerHTML = '<i class="fa-solid fa-house"></i>';
+            container.setAttribute('data-tooltip', 'Zoom to full  extent')
+            container.style.backgroundColor = 'white';
+            container.style.width = '34px';
+            container.style.height = '36px';
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+
+            // Attach the event listener to the container
+            container.onclick = function() {
+                map.setView([37.8, -96.9], 4); // Set this to the center and zoom level of the USA
+            }
+            return container;
+        }
+    });
+    // Add the new home control to the map
+    map.addControl(new L.Control.HomeButton({ position: 'topleft' }));
+
+    // Define regions to create custom zoom control - include center coordinates and zoom levels
+    const regions = {
+        'pnw': { tooltip: 'Zoom to Pacific Northwest', center: [43.5, -120.5], zoom: 5 }, // Pacific Northwest
+        'sw': { tooltip: 'Zoom to Southwest', center: [34.0, -112.0], zoom: 5 }, // Southwest
+        'mw': { tooltip: 'Zoom to Midwest', center: [41.0, -93.0], zoom: 5 }, // Midwest
+        'ne': { tooltip: 'Zoom to Northeast', center: [43.0, -73.0], zoom: 5 }, // Northeast
+        'se': { tooltip: 'Zoom to Southeast', center: [33.0, -85.0], zoom: 5 } // Southeast
+    };
+
+    // Create and add a custom zoom control for each region
+    Object.keys(regions).forEach(function(regionKey) {
+        var region = regions[regionKey];
+        L.Control.RegionButton = L.Control.extend({
+            onAdd: function(map) {
+                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom region-button');
+
+                // Set the inner HTML for the button, e.g., the name of the region
+                container.innerHTML = regionKey.toUpperCase();
+                // Add the data-tooltip attribute
+                container.setAttribute('data-tooltip', region.tooltip)
+
+                // Style region buttons
+                container.style.backgroundColor = 'white';
+                container.style.width = '35px';
+                container.style.height = '30px';
+                container.style.display = 'flex';
+                container.style.justifyContent = 'center';
+                container.style.alignItems = 'center';
+                container.fontFamily = "Protest Revolution";
+
+                // Attach the event listener
+                container.onclick = function() {
+                    map.setView(region.center, region.zoom);
+                }
+
+                return container;
+            }
+        });
+
+        // Add each region zoom control to the map
+        map.addControl(new L.Control.RegionButton({ position: 'topleft' }));
+    });
+
     // Add a tile layer to the map using Stadia Maps' Alidade Smooth tiles for terrain visualization
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
         attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, and the GIS User Community',
