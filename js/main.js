@@ -1,23 +1,38 @@
 
-// Global variables
-let map;
-let mapParams = {
+/**
+ * This file contains the main JavaScript code for the Ignite Insight application.
+ * It sets up global variables, event listeners, and functions for creating and interacting with the Leaflet map.
+ * The code also includes functions for updating the displayed year, adding custom controls to the map, and setting up an Intersection Observer for scrolling events.
+ * @file FILEPATH: /C:/Users/asher/Documents/UW_MAD/Geog575/Final_Project/Repo/2024_IgniteInsight/js/main.js
+ * @global
+ * @namespace
+ */
+// Set the Global variables
+const mapParams = {
     'containerID': 'map-container',
     'center':  [40.61063, -122.63627],
     'zoom': 7
 }
-const startYear = 1984;
-const endYear = 2019;
-let currentYear = startYear;
-let minValue;
-let maxValue;
-let vandalismCountsByYear = {};
+const dataDates = {
+    'fire-history': {
+        startYear: 1984,
+        endYear: 2019
+    },
+    'drought-history': {
+        startYear: 2000,
+        endYear: 2022
+    }
+}
+const geoJsonPaths = {
+    'mtbs-fires-pts': 'data/mtbs_firePts84_22.geojson',
+    'mtbs-fires-poly': 'data/mtbs_fire_poly.geojson'
+}
+let map;
+let currentYear = dataDates['fire-history'].startYear;
 let geoJson;
-let jsonData;
-let rangeSlider;
-let classRanges = {};
-const scrollElement = document.getElementById('map-description');
-const wildfireHistorySection = document.getElementById('wildfire-history');
+
+const scrollElement = document.getElementById('map-narrative');
+const wildfireHistorySection = document.getElementById('wildfire-history-section');
 const thresholds = Array.from({ length: 100 }, (_, index) => index * 0.01);
 let isHistorySectionVisible = false;
 
@@ -26,10 +41,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const splashScreen = document.getElementById('splash-screen');
     const closeButton = document.getElementById('close-splash');
     const toggleBtn = document.getElementById('toggle-panel-btn');
-    rangeSlider = document.querySelector('.range');
 
-    // call legend function on page load
-    createLegend();
+    createMap(mapParams.containerID, mapParams.center, mapParams.zoom);
+
+    // Set up Intersection Observer for sidebar panel scrolling events
+    setUpIntersectionObserver();
 
     // Add event listener to close the splash screen when the close button is clicked
     closeButton.addEventListener('click', function () {
@@ -44,9 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach the event listener to the toggle button and fire the toggle function when the close button is clicked
     toggleBtn.addEventListener('click', toggleSidePanelAndAdjustMap);
 
-     // Set up Intersection Observer
-     setUpIntersectionObserver();
-
     // Event listener for scrolling events
     scrollElement.addEventListener('scroll', function() {
         if (isHistorySectionVisible) {
@@ -59,13 +72,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const scrollPercentage = scrollPosition / (scrollHeight - visibleHeight);
 
             // Calculate the current year based on scroll percentage
-            const yearRange = endYear - startYear;
-            const scrolledYear = Math.round(startYear + scrollPercentage * yearRange);
+            const yearRange = dataDates['fire-history'].endYear - dataDates['fire-history'].startYear;
+            const scrolledYear = Math.round(dataDates['fire-history'].startYear + scrollPercentage * yearRange);
 
             if (scrolledYear !== currentYear) {
                 currentYear = scrolledYear;
-                //updateYearDisplay(currentYear);
-                //addFireBoundariesByTime(currentYear);
+                updateYearDisplay(currentYear);
+                addFireBoundariesByTime(currentYear);
             }
         }
     });
@@ -148,66 +161,21 @@ const createMap = (containerId, center, zoom) => {
     });
 
     // Add a tile layer to the map using Stadia Maps' Alidade Smooth tiles for terrain visualization
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
-        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, and the GIS User Community',
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         ext: 'png'
     }).addTo(map)
 
-// TODO: UPDATE additional attribution
-    map.attributionControl.addAttribution('Vandalism data &copy; <a href="https://www.portland.gov/police/open-data/crime-statistics">Portland Police Bureau</a>');
-
-    // Add ESRI Feature Layer
-    // const esriLayer = L.esri.featureLayer({
-    //     url: "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/US_Drought_Intensity_v1/FeatureServer/2",
-    //     style: (feature) => {
-    //         console.log('feature: ' + feature)
-    //         return { color: '#bada55' };  // Change the style based on your preferences
-    //     }
-    // }).addTo(map);
-    // TODO: Determine which data set is better to use for showing fire perimeters
-
-    // var mtbsFeatureLayer = L.esri.featureLayer({
-    //     url: 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_MTBS_01/MapServer/63',
-    // }).addTo(map);
-    // mtbsFeatureLayer.on('click', function(event) {
-    //     console.log('Feature Attributes:', event.layer.feature.properties);
-    //   });
-
-    // const esriFeatureLayer = L.esri.featureLayer({
-    //     url: "https://services.arcgis.com/nGt4QxSblgDfeJn9/arcgis/rest/services/USA_Burned_Area_Descriptions_2/FeatureServer/0",
-    //     style: (feature) => {
-    //         let style = {
-    //             color: '#fff',
-    //             weight: 1, // no outline color
-    //             fillOpacity: 0.5
-    //           };
-    //           if (feature.properties.WildfireRisk === "very low") {
-    //             style.fillColor = "#f97316";
-    //           } else if (feature.properties.WildfireRisk === "low") {
-    //             style.fillColor = "#98D9C1";
-    //           } else if (feature.properties.WildfireRisk === "moderate") {
-    //             style.fillColor = "#FFCF64 ";
-    //           } else if (feature.properties.WildfireRisk === "high") {
-    //             style.fillColor = "#FF821D ";
-    //           } else if (feature.properties.WildfireRisk === "very high") {
-    //                 style.fillColor = "#CA3411 ";
-    //           } else {
-    //             style.fillColor = "#ED5151";
-    //           }
-
-    //         return style;
-    //     }
-    //    }).addTo(map);
-
-    // esriFeatureLayer.on('click', function(event) {
-    //     console.log('Feature Attributes:', event.layer.feature.properties);
-    // });
+// ==================> TODO: UPDATE additional attribution on data change  <=========================================//
+    map.attributionControl.addAttribution('Historical fire data &copy; <a href="https://www.mtbs.gov/">Monitoring Trends in Burn Severity</a>');
 
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright', metric: false }).addTo(map);
 
-    // Initiate the retrieval and display of neighborhood boundaries, once fully loaded in the DOM, call and load the addNeighborhoodPoints function, in order to ensure that addNeighborhoodPoints() is called only after the successful addition of the neighborhood boundaries layer
-    // addNeighborhoodBoundaries();
+    // Initiate the retrieval and display of wildfire points
+    loadFireData ();
+    createCloroplethLegend();
+
 };
 
 // Function to update the displayed year
