@@ -670,33 +670,16 @@ svg:not(:root) {
 /* LEGEND  */
 /* ================================================================================== */
 
-.symbols-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
 .legend-container {
-    width: 20%;
-    position: absolute;
-    bottom: 6%;
-    left: 20px;
-    flex-direction: column;
+    order: 2;
+    height: 28%;
+    width: 95%;
+    flex-direction: column; /* Unnecessary if content is already vertical */
     align-items: center;
     padding: 20px 0;
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
     z-index: 1000;
-}
-
-.legend {
-    order: 2;
-    padding: 6px 10px;
-    font-family: "Reem Kufi Fun", sans-serif;
-    font-size: 16px;
-    background-color: white;
 }
 
 #legend-title {
@@ -704,101 +687,70 @@ svg:not(:root) {
     font-family: "Reem Kufi Fun", sans-serif;
     font-size: 20px;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     font-variant: small-caps;
 }
 
-.legendCircle {
-    position: absolute;
-    left: 40%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background-color: rgb(255, 120, 0, .6);
-    box-shadow: 0 0 0 2px white;
-    z-index: 1;
-    margin-right: 10px;
-}
-
-.legendValue {
+#cloropleth-container {
+    display: flex; /* Use flex layout for the container */
+    flex-direction: row; /* Lay out legend items in a row */
+    justify-content: space-around; /* Space out the items evenly */
+    padding: 6px 10px;
     font-family: "Reem Kufi Fun", sans-serif;
-    font-size: 20px;
-    color: black;
+    font-size: 16px;
+}
+
+.legend-item-cloropleth {
+    display: flex; /* Use flex layout for the items */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    margin-bottom: 25px;
+}
+
+.legendCircle-cloropleth {
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-bottom: 4px; /* Space between circle and label */
+}
+
+.legendValue-cloropleth {
+    text-align: center; /* Center-align the text label */
+    white-space: nowrap; /* Ensure the label is on one line */
+}
+
+#proportional-container {
+    position: static;
+    height: auto;
     width: 100%;
-    z-index: 2;
-    text-align: right;/
-}
-
-.legend-set {
+    order: 2;
+    padding: 6px 10px;
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 16px;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    height: 100%;
-    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.legendCircle {
-    /* ... other styles for the circles ... */
-}
-
-/* Hover effect - Change opacity for highlighting */
-.legendCircle:hover {
-    opacity: 0.8;
-}
-
-/* ================================================================================== */
-/* TODO: DELETE DEPRECATED STYLES */
-/* ================================================================================== */
-
-/* More specific targeting for the hover effect */
-.legendCircle:hover~.map .leaflet-layer.mid {
-    fill: blue !important;
-    /* Add !important temporarily for debugging */
-}
-
-.low {
-    /* background-color: #fee0d2; */
-    /* Example color for low class */
-}
-
-.mid {
-    /* background-color: #fdae6b; */
-    /* Example color for mid class */
-}
-
-.high {
-    /* background-color: #f16913; */
-    /* Example color for high class */
-}
-
-/* marker .leaflet-interactive {
+.legend-item-proportional {
     display: flex;
-    justify-content: center;
     align-items: center;
-    line-height: 1;
-    color: #fff;
-    font-size: 12px;
-    box-shadow: 0px 0px 10px #ff0000;
-    border-radius: 100%;
-    border: 2px solid #fff;
-    background: #ff3939;
-} */
+    /* margin-bottom: 5px; */
+    width: 100%; /* Ensure the item takes full width */
+  }
 
-.leaflet-interactive:hover {
-    animation: border-pulse 1.5s infinite;
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+.legendCircle-proportional {
+    /* width: 100px; */
+    position: absolute; /* Absolute positioning */
+    bottom: 4%; /* Align to bottom of container */
+    border-radius: 50%;
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Ensure the centering is accurate */
+    border: 2px solid black;
 }
 
-@keyframes border-pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 1);
-    }
-
-    70% {
-        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-    }
+.legendValue-proportional {
+    bottom: 2%; /* Align to bottom of container */
+    margin-left: 300px;
+    width: fit-content;
 }
 
