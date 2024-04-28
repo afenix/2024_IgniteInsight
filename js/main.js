@@ -235,7 +235,7 @@ console.log('history section is no longer visible');
 };
 
 // Function to toggle the side panel and adjust the map
-const toggleSidePanelAndAdjustMap = () => {
+const toggleSidePanelAndAdjustMap = (event) => {
     const sidePanel = document.getElementById('side-panel-container');
     const mapContainer = document.getElementById('map-container');
     // Get the scale bar element
@@ -248,9 +248,10 @@ const toggleSidePanelAndAdjustMap = () => {
 
     // Change the text content of the toggle button based on the current state of the side panel
     if (sidePanel.classList.contains('closed')) {
-        this.textContent = 'Open';
+        console.log('i should be switching to open now');
+        event.target.textContent = 'Open';
     } else {
-        this.textContent = 'Close';
+        event.target.textContent = 'Close';
     }
 
     // Wait for the transition, then adjust the map size and re-center
