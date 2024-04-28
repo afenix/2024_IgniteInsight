@@ -10,8 +10,8 @@
 // Set the Global variables
 const mapParams = {
     'containerID': 'map-container',
-    'center':  [40.61063, -122.63627],
-    'zoom': 7
+    'center':  [45, -100],
+    'zoom': 3
 }
 const dataDates = {
     'fire-history': {
@@ -87,9 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // Function to instantiate the Leaflet map
 const createMap = (containerId, center, zoom) => {
     // Create the map and set its initial view to the specified coordinates and zoom level
-    // Restrict the user's viewport to the specified coordinates and zoom levels
     map = L.map(containerId, {
-        center: center, // Redding, CA coordinates
+        center: center, // USA
         zoom: zoom, // Initial zoom level
     });
 
@@ -109,7 +108,7 @@ const createMap = (containerId, center, zoom) => {
 
             // Attach the event listener to the container
             container.onclick = function() {
-                map.setView([37.8, -96.9], 4); // Set this to the center and zoom level of the USA
+                map.setView(mapParams.center, mapParams.zoom); // Set this to the center and zoom level of the United States, including Alaska
             }
             return container;
         }
@@ -117,9 +116,35 @@ const createMap = (containerId, center, zoom) => {
     // Add the new home control to the map
     map.addControl(new L.Control.HomeButton({ position: 'topleft' }));
 
+    // Create a new control for zooming to user's location
+    L.Control.UserLocation = L.Control.extend({
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom zoom-user-button');
+            // Style Home button - use Font Awesome's home icon
+            container.innerHTML = '<i class="fa-solid fa-location-arrow"></i>';
+            container.setAttribute('data-tooltip', 'Zoom to your location')
+            container.style.backgroundColor = 'white';
+            container.style.width = '34px';
+            container.style.height = '36px';
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+
+            // Attach the event listener to the container
+            container.onclick = function() {
+                map.locate({setView: true, maxZoom: 8}); // user Leaflet location
+            }
+            return container;
+        }
+    });
+    // Add the new home control to the map
+    map.addControl(new L.Control.UserLocation({ position: 'topleft' }));
+
     // Define regions to create custom zoom control - include center coordinates and zoom levels
     const regions = {
-        'pnw': { tooltip: 'Zoom to Pacific Northwest', center: [43.5, -120.5], zoom: 5 }, // Pacific Northwest
+        'us': { tooltip: 'Zoom to Continental United States', center: [39.828, -98.5], zoom: 4 }, // Continental United States
+        'ak': { tooltip: 'Zoom to Alaska', center: [65.67, -151.626], zoom: 4.5 }, // Alaska
+        'pnw': { tooltip: 'Zoom to Pacific Northwest', center: [39.9, -120.5], zoom: 5 }, // Pacific Northwest
         'sw': { tooltip: 'Zoom to Southwest', center: [34.0, -112.0], zoom: 5 }, // Southwest
         'mw': { tooltip: 'Zoom to Midwest', center: [41.0, -93.0], zoom: 5 }, // Midwest
         'ne': { tooltip: 'Zoom to Northeast', center: [43.0, -73.0], zoom: 5 }, // Northeast
