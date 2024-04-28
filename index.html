@@ -48,7 +48,7 @@
                         wildfire intensity and area over the years. Identify trends and prepare
                         better for future risks.
                     </li>
-                    <li>
+                    <!-- <li>
                         <b>Population and Development Impacts:</b> Our maps illustrate how changes
                         in population density and urban development correlate with increased
                         wildfire risks. See the bigger picture of how human activities intertwine
@@ -58,14 +58,15 @@
                         <b>Protecting Communities and Nature:</b> Explore which areas face
                         heightened risks due to socio-economic factors and how these risks impact
                         both human and wildlife habitats.
-                    </li>
+                    </li> -->
                 </ul>
                 <h4>Are you ready to turn insights into informed actions?</h4>
                 <!-- Continue button -->
-                <button id="close-splash">Start Your Exploration</button>
+                <button id="close-splash">Start Exploring</button>
             </div>
         </div>
     </div>
+    <!-- Map Container -->
     <div id="map-container">
         <div id="popup-content" style="display: none;"></div>
         <div id="slider-container">
@@ -77,7 +78,7 @@
                         <path fill-rule="evenodd"
                             d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                     </svg></button>
-                <input class='range' id="range" type='range' min="0" max="8" step="1">
+                <input class='range' id="yearSlider" type='range' min="0" max="39" step="1">
                 <button class="button" id="forward"><svg xmlns="http://www.w3.org/2000/svg"
                         width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
                         viewBox="0 0 16 16">
@@ -92,7 +93,7 @@
 
     <!-- Side Panel   -->
     <div id="side-panel-container">
-        <div id="map-description">
+        <div id="map-narrative">
             <section id="Welcome">
                 <h2>How to Navigate Ignite Insights</h2>
                 <p>Welcome to your interactive guide to understanding wildfires and their impacts.
@@ -124,7 +125,7 @@
                     life, right before your eyes!</p>
 
             </section>
-            <section id="wildfire-history">
+            <section id="wildfire-history-section">
                 <h2>Wildfire History</h2>
                 <p>Early Records and Observations: Historically, wildfires have always been a
                     natural part of the ecosystems in the Western United States, particularly in
@@ -231,6 +232,8 @@
                 d="M3 13h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0-6h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 12h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z" />
         </symbol>
     </svg>
+    <!-- APP DESCRIPTION/ATTRIBUTION  -->
+    <!-- TODO: CHANGE CLASS NAMES -->
     <div class="sidebar" title="Map Guide">
         <button aria-label="close sidebar" type="button" class="close-button">
             <svg>
@@ -249,28 +252,17 @@
             <div class="item-content" id="menu">
                 <h1 class="main-title">Explore Vandalism Trends Through Time</h1>
                 <br class="content">
-                <h2>Map Navigation Guide</h2>
+                <h2>How to Navigate Ignite Insights</h2>
                 <br>
-                <p>Welcome to the Ignite Insights interactive map, designed to provide you with a
-                    view of
-                    trends across Portland neighborhoods from 2015 to 2023. Here's how to navigate
-                    the map:</p>
+                <p class="attribution">Favicon by <a target="_blank" href="https://icons8.com/icon/UJcE6K1qaeAT/wildfire">Wildfire</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+                <p>Welcome to your interactive guide to understanding wildfires and their impacts. Our platform is designed to visually connect you with extensive wildfire data as you explore the content in our side panel. Here’s how to get the most out of Ignite Insights::</p>
                 <br>
-                <li><strong>Explore by time:</strong> Use the scroll bar at the bottom of the map
-                    to travel through years of data, from 2015 to 2023. As
-                    you change the year, notice how the map visualization, legend, and neighborhood
-                    information pane
-                    automatically update to reflect vandalism trends of the selected year.</li></br>
-                <li><strong>Explore specific neighborhood data:</strong> Click on the individual
-                    neighborhood points to see detailed information about annual vandalism
-                    counts in that area. To see the neighborhood name, simply click within the
-                    neighborhood boundary.
+                <li><strong>Interactive Map & Side Panel Sync:</strong> As you scroll through the sections on the right, the map on the left will dynamically update to reflect the information and data ranges you’re reading about. This synchronized interaction helps you see the real-time impact of the data being discussed.</li></br>
+                <li><strong>Exploring Wildfire History:</strong> croll to ‘Wildfire History’: As you read about changes in wildfire trends over the years, the map will display the boundaries of historical wildfires from 1984 to 2022. Use the time slider below the map to adjust the years and observe changes directly.
                 </li></br>
-                <li><strong>Search by neighborhood:</strong>Click on the search icon under the zoom
-                    controls on the upper left corner of the map to find and
-                    zoom to a specific neighborhood.</li></br>
-                <li><strong>Use the zoom controls:</strong> Zoom in or out or pan through the data
-                    to get a closer look at specific neighborhoods.</li>
+                <li><strong>Understanding WUI Expansion:</strong>Move to the ‘WUI Data’ Section: When you reach this topic, the map will shift to show the Wildland-Urban Interface data, illustrating how these boundaries have expanded over time.
+                </li></br>
+                <li><strong>Navigation Controls:</strong>Use the panel on the right to navigate through topics. The map will automatically adjust to show the relevant data as you move between sections.</li>
                 </ul>
             </div>
         </div>
@@ -280,10 +272,10 @@
     <!--external script links -->
     <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> -->
     <script type="text/javascript" src="./lib/leaflet/leaflet-src.js"></script>
-    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
     <script type="text/javascript" src="./lib/leaflet-search/leaflet-search.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script> -->
     <script type="text/javascript" defer src="./js/main.js"></script>
 </body>
 
