@@ -1,3 +1,4 @@
+
 * {
     box-sizing: border-box;
 }
@@ -21,20 +22,9 @@ html {
     float: left;
 }
 
-.reg-weight {
-    margin: 25px 0 0 0;
-    text-align: center;
-    font-family: "Protest Revolution", sans-serif;
-    font-optical-sizing: auto;
-    font-size: 26px;
-    font-weight: 400;
-    font-style: italic;
-    color: white;
-    font-variation-settings:
-        "MORF" 34,
-        "SHLN" 73.9;
-}
-
+/* ================================================================================== */
+/* Custom leaflet map controls  */
+/* ================================================================================== */
 
 .leaflet-control-custom.home-button {
     margin-left: 11px !important;
@@ -50,16 +40,42 @@ html {
     content: attr(data-tooltip);
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 10px;
+    padding: 8px;
     position: absolute;
     opacity: 0;          /* Make tooltip initially invisible */
     transition: opacity 0.3s; /* Add a transition for a smooth effect */
-    margin: 0 0 0 120px !important;
+    margin: 0 0 0 100px !important;
 }
 
 .leaflet-control-custom.home-button:hover[data-tooltip]::after {
     opacity: 1; /* Show the tooltip on hover */
-    margin: 0 0 0 120px !important;
+    margin: 0 0 0 100px !important;
+}
+
+.leaflet-control-custom.zoom-user-button {
+    margin-left: 11px !important;
+    font-family: "Reem Kufi Fun", sans-serif !important;
+}
+
+.leaflet-control-custom.zoom-user-button:hover {
+    margin-left: 11px !important;
+    background-color: #e8e7e3 !important;
+}
+
+.leaflet-control-custom.zoom-user-button[data-tooltip]::after { /* This targets the tooltip itself */
+    content: attr(data-tooltip);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    position: absolute;
+    opacity: 0;          /* Make tooltip initially invisible */
+    transition: opacity 0.3s; /* Add a transition for a smooth effect */
+    margin: 0 0 0 100px !important;
+}
+
+.leaflet-control-custom.zoom-user-button:hover[data-tooltip]::after {
+    opacity: 1; /* Show the tooltip on hover */
+    margin: 0 0 0 100px !important;
 }
 
 
@@ -87,9 +103,6 @@ html {
     opacity: 1; /* Show the tooltip on hover */
     margin: 0 0 0 120px !important;
 }
-
-
-
 
 /* ================================================================================== */
 /* Splash Screen  */
@@ -153,7 +166,7 @@ html {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    max-width: 60%;
     text-align: center;
     background-color: rgba(37, 35, 35, 1);
 }
@@ -183,12 +196,9 @@ html {
     border-radius: 10px;
 }
 
-/* TODO: style the button */
 #close-splash {
     display: block;
-    /* Makes the button a block-level element */
     margin: 0 auto;
-    /* Applies automatic margins to the left and right */
     font-family: "Reem Kufi Fun", sans-serif;
     padding: 10px 20px;
     font-size: 16px;
@@ -204,7 +214,7 @@ html {
   }
 
 /* ================================================================================== */
-/* Map Description Sidepanel  */
+/* Map Narrative Scrollable Sidepanel  */
 /* ================================================================================== */
 
 #side-panel-container {
@@ -213,17 +223,18 @@ html {
     top: 0;
     width: 33.33%;
     height: 100%;
+    overflow-y: auto; /* Enable scrolling on the side panel */
     transition: right 0.5s;
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: flex; /* Activate Flexbox */
+    flex-direction: column; /* Arrange items in a column */
+    justify-content: center; /* (Keep this if you want centering) */
+    align-items: center; /* (Keep this if you want centering)*/
     background-image: url('../img/DALLE-fire2.jpg');
     background-size: cover;
     background-position: center;
     box-sizing: border-box;
-}
+  }
 
 #side-panel-container.closed {
     right: -33.33%;
@@ -233,28 +244,25 @@ html {
     width: 100%;
 }
 
-#map-description {
+#map-narrative {
+    order: 1;
+    max-height: 68%;
     font-family: "Reem Kufi Fun", sans-serif;
     font-optical-sizing: auto;
     font-weight: regular;
     font-size: 16px;
-    color: #fff;
-    border-radius: 10px;
+    color: rgba(0, 0, 0, 1);
     width: 95%;
     max-width: 500px;
     overflow: auto;
     padding: 0 20px 0 20px;
-    background: rgba(38, 37, 37, 0.8);
+    /* background: rgba(38, 37, 37, 0.8); */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
-#wildfire-history {
+#wildfire-history-section {
     min-height: 300px; /* Adjust the height as needed */
     overflow-y: auto;  /* Add a scrollbar if the content exceeds the height */
-}
-
-.map-title {
-    text-align: center;
 }
 
 #toggle-panel-btn {
@@ -278,11 +286,6 @@ html {
 /* Adjusting root SVG and hidden state remains unchanged */
 svg:not(:root) {
     overflow: hidden;
-}
-
-#map-description {
-    overflow-y: scroll; /* Make the content scrollable */
-    height: 85vh;  /* Adjust height as needed */
 }
 
 .hidden {
@@ -573,6 +576,7 @@ svg:not(:root) {
 
 .range {
     -webkit-appearance: none;
+    appearance: none;
     width: 420px;
     height: 2px;
     background: transparent;
@@ -615,7 +619,7 @@ svg:not(:root) {
 }
 
 /* ================================================================================== */
-/* Tooltips  */
+/* MAP POPUPS  */
 /* ================================================================================== */
 
 #popup-content {
