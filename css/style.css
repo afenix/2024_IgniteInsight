@@ -20,6 +20,33 @@ html {
     width: calc(100% - 33.33%);
     /* Adjust width to take into account the side-panel-container */
     float: left;
+    /* position: relative; */
+}
+
+#map-title {
+    justify-content: center; /* Center elements horizontally */
+    width: 100%; /* Make the container take full width of the page */
+    position: absolute; /* Position at the top of the page */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: regular;
+    font-size: 24px;
+    color: black;
+    display: inline-flex; /* Use inline-flex instead of flex */
+    align-items: center;
+}
+
+.fire-year {
+    color: black;
+    font-weight: bold;
+}
+
+.total-fire-acres {
+    color: black;
+    font-weight: bold;
 }
 
 /* ================================================================================== */
@@ -143,6 +170,10 @@ html {
 #splash-welcome {
     color: #E85D04;
     font-size: 36px;
+}
+
+.splash-subtitle {
+    margin-bottom: 0;
 }
 
 .splash-screen {

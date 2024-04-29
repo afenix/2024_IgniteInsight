@@ -542,6 +542,11 @@ const filterMapByYear = (year) => {
                 features: data.features.filter(feature => feature.properties.Ig_Date?.substring(0, 4) === year)
             };
             addFireDataToMap(filteredData);
+            // Calculate total acres burned for the year
+            let yearSumAcres = calculateTotalAcresByYear(filteredData);
+
+            // Update the map title with the total acres burned for the year
+            updateMapTitle(yearSumAcres, year);
         })
         .catch(error => {
             console.error("Error filtering data:", error);
@@ -640,6 +645,72 @@ const createCloroplethLegend = () => {
         itemContainer.appendChild(legendValue);
         legendContainer.appendChild(itemContainer);
     });
+};
+
+/**
+ * Calculates the total acres burned by year from the given geojsonData.
+ *
+ * @param {Object} geojsonData - The geoJSON data containing the features with burn data.
+ * @returns {Object} - An object with the total acres burned by year.
+ */
+const calculateTotalAcresByYear = (geojsonData) => {
+    const summary = {};
+
+    geojsonData.features.forEach(feature => {
+        const year = feature.properties.Ig_Date.substring(0, 4);
+        const incType = feature.properties.Incid_Type; // 'Incid_Type' is the property for ignition type
+        const acres = feature.properties.BurnBndAc || 0;
+
+        if (!summary[year]) {
+            summary[year] = {
+                totalAcres: 0 // Initialize total acres for all fire types
+            };
+        }
+        if (!summary[year][incType]) {
+            summary[year][incType] = 0;
+        }
+
+        summary[year][incType] += acres;
+        summary[year].totalAcres += acres; // Increment total acres for the year
+    });
+
+    return summary;
+};
+
+/**
+ * Updates the map title with the given number of acres.
+ * @param {number} acres - The number of acres to display in the map title.
+ * @returns {void}
+ */
+const updateMapTitle = (yearData, year) => {
+    console.log('yearData:', yearData);
+    // Check if data for the specific year is available
+    if (!yearData[year]) {
+        console.error('Data for year', year, 'is not available.');
+        return;
+    }
+
+    // Directly retrieve values from the yearData
+    const totalFireAcres = yearData[year]['totalAcres'] || 0;  // Use a default of 0 if no data
+    const prescribedFireAcres = yearData[year]["Prescribed Fire"] || 0;  // Use a default of 0 if no data
+    const unknownAcres = yearData[year]['Unknown'] || 0;
+    const wildfireAcres = yearData[year]['Wildfire'] || 0;
+    const wildLandFireUseAcres = yearData[year]["Wildland Fire Use"] || 0;
+
+    // Update the DOM elements with the new values
+    const fireYearElements = document.getElementsByClassName('fire-year');
+    Array.from(fireYearElements).forEach(element => {
+        element.textContent = year;
+    });
+
+    const fireTotalElements = document.getElementsByClassName('total-fire-acres');
+    Array.from(fireTotalElements).forEach(element => {
+        element.textContent = totalFireAcres.toLocaleString();
+    });
+    document.getElementById('wildfire-acres').textContent = wildfireAcres.toLocaleString(); // Format numbers with commas
+    document.getElementById('prescribed-acres').textContent = prescribedFireAcres.toLocaleString();
+    document.getElementById('wildland-fire-use-acres').textContent = wildLandFireUseAcres.toLocaleString();  // Assuming 'Wildfire' is equivalent to 'Wildland Fire Use'
+    document.getElementById('unknown-acres').textContent = unknownAcres.toLocaleString();
 };
 
 

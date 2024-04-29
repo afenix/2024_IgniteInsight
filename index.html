@@ -68,6 +68,10 @@
     </div>
     <!-- Map Container -->
     <div id="map-container">
+        <div id="map-title">
+            <img src="img/icons8-wildfire-64.png" alt="Header Icon">
+            <h1 id="splash-welcome">Ignite Insights</h1>
+        </div>
         <div id="popup-content" style="display: none;"></div>
         <div id="slider-container">
             <div id="slider" class="slider">
@@ -86,44 +90,23 @@
                             d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
                     </svg></i></button>
             </div>
-            <div id="wildfire-total">Total Wildfire Count for <span
-                    id="selected-year">1984</span>: <span id="total-count"> 0</span></div>
+            <div id="wildfire-total"><span id="fire-acres"></span> acres were affected by wildfires
+                in the U.S.</div>
         </div>
     </div>
 
     <!-- Side Panel   -->
     <div id="side-panel-container">
         <div id="map-narrative">
-            <section id="Welcome">
-                <h2>How to Navigate Ignite Insights</h2>
-                <p>Welcome to your interactive guide to understanding wildfires and their impacts.
-                    Our platform is designed to visually connect you with extensive wildfire data as
-                    you explore the content in our side panel. Here’s how to get the most out of
-                    Ignite Insights:</p>
-                <br>
-                <ul>
-                    <li><strong>Interactive Map & Side Panel Sync:</strong> As you scroll through
-                        the sections on the right, the map on the left will dynamically update to
-                        reflect the information and data ranges you’re reading about. This
-                        synchronized interaction helps you see the real-time impact of the data
-                        being discussed.</li></br>
-                    <li><strong>Exploring Wildfire History:</strong> Scroll to ‘Wildfire History’:
-                        As you read about changes in wildfire trends over the years, the map will
-                        display the boundaries of historical wildfires from 1984 to 2022. Use the
-                        time slider below the map to adjust the years and observe changes directly.
-                    </li></br>
-                    <li><strong>Understanding WUI Expansion:</strong>Move to the ‘WUI Data’ Section:
-                        When you reach this topic, the map will shift to show the Wildland-Urban
-                        Interface data, illustrating how these boundaries have expanded over time.
-                    </li></br>
-
-                    <li><strong>Navigation Controls:</strong>Use the panel on the right to navigate
-                        through topics. The map will automatically adjust to show the relevant data
-                        as you move between sections.</li>
-                </ul>
-                <p>Start your journey by scrolling down and watch as Ignite Insights brings data to
-                    life, right before your eyes!</p>
-
+            <section id="summary-section">
+                <h2><span class="fire-year"></span> - <span class="total-fire-acres"></span> total acres burned</h2>
+                <p>In <span class="fire-year"></span> a total of <span class="total-fire-acres"></span>
+                    acres were affected by fires across the U.S.</p>
+                <p>Of those acres, <b><span id="wildfire-acres"></span></b> acres were wildfires. Whereas,
+                    <b><span id="prescribed-acres"></span></b> were prescribed burns, and <b><span
+                        id="wildland-fire-use-acres"></span></b> acres were wildland fire use. The
+                    remaining <b><span id="unknown-acres"></span></b> were of unknown origin.
+                </p>
             </section>
             <section id="wildfire-history-section">
                 <h2>Wildfire History</h2>
