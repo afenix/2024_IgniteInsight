@@ -104,6 +104,10 @@ html {
     margin: 0 0 0 120px !important;
 }
 
+.leaflet-marker-icon.fire-icon {
+    opacity: 0.8;
+ }
+
 /* ================================================================================== */
 /* Splash Screen  */
 /* ================================================================================== */
@@ -671,90 +675,142 @@ svg:not(:root) {
 }
 
 /* ================================================================================== */
-/* LEGEND  */
+/* LEGEND */
+/* ================================================================================== */
+
+/* ================================================================================== */
+/* LEGEND */
 /* ================================================================================== */
 
 .legend-container {
     order: 2;
-    height: 28%;
     width: 95%;
-    flex-direction: column; /* Unnecessary if content is already vertical */
-    align-items: center;
-    padding: 20px 0;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items horizontally within the container */
+    padding: 20px;
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     z-index: 1000;
 }
 
 #legend-title {
-    order: 1;
     font-family: "Reem Kufi Fun", sans-serif;
     font-size: 20px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Adds space between the title and the next element */
     font-variant: small-caps;
+    width: 100%; /* Ensures the title spans the full width of its container */
 }
+
+.columns-wrapper {
+    display: flex;
+    justify-content: space-between; /* Space items equally horizontally */
+    width: 100%; /* Match width to the parent container */
+}
+
 
 #cloropleth-container {
-    display: flex; /* Use flex layout for the container */
-    flex-direction: row; /* Lay out legend items in a row */
-    justify-content: space-around; /* Space out the items evenly */
-    padding: 6px 10px;
-    font-family: "Reem Kufi Fun", sans-serif;
-    font-size: 16px;
-}
-
-.legend-item-cloropleth {
-    display: flex; /* Use flex layout for the items */
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center children horizontally */
-    margin-bottom: 25px;
-}
-
-.legendCircle-cloropleth {
-    border-radius: 50%;
-    border: 1px solid white;
-    margin-bottom: 4px; /* Space between circle and label */
-}
-
-.legendValue-cloropleth {
-    text-align: center; /* Center-align the text label */
-    white-space: nowrap; /* Ensure the label is on one line */
-}
-
-#proportional-container {
-    position: static;
-    height: auto;
-    width: 100%;
-    order: 2;
-    padding: 6px 10px;
-    font-family: "Reem Kufi Fun", sans-serif;
-    font-size: 16px;
+    width: 40%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
 
-.legend-item-proportional {
-    display: flex;
-    align-items: center;
-    /* margin-bottom: 5px; */
-    width: 100%; /* Ensure the item takes full width */
-  }
-
-.legendCircle-proportional {
-    /* width: 100px; */
-    position: absolute; /* Absolute positioning */
-    bottom: 4%; /* Align to bottom of container */
-    border-radius: 50%;
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Ensure the centering is accurate */
-    border: 2px solid black;
+.column-header-cloropleth {
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px; /* Space below headers */
+    color: #333;
+    text-align: left; /* Align header text to the left */
 }
 
-.legendValue-proportional {
-    bottom: 2%; /* Align to bottom of container */
-    margin-left: 300px;
-    width: fit-content;
+.legend-item-cloropleth {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.legend-item-cloropleth img {
+    margin-right: 10px;
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Adjust as needed */
+}
+
+.legendValue-cloropleth {
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+#proportional-container {
+    width: 55%;
+    display: grid; /* Use grid layout */
+    grid-template-columns: auto 1fr; /* Single column for the entire container */
+    grid-template-rows: auto auto 1fr;  /* Row for header, row for icons/labels, flexible row for content */
+    gap: 10px; /* Adds space between the rows */
+}
+
+.column-header-proportional {
+    grid-column: 1 / -1; /* Span across all columns in the grid */
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-align: left; /* Align text to the left */
+    padding-left: 10px; /* Padding to align with the content below */
+}
+
+.icon-container {
+    display: flex; /* Makes sub-containers flexible */
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;  /* Center items horizontally */
+}
+
+.icon-container img {
+    margin: 10px 0 25px 0;
+}
+
+.icon-container img:nth-child(2) {
+    margin: 0 0 25px 0; /* Slightly reduced margin for the second image */
+}
+
+.icon-container img:nth-child(3) {
+    margin: 0 0 10px 0; /* Reduced margin for the third image */
+}
+
+.icon-container img:nth-child(4) {
+    margin: 0 0 0 0; /* Reduced margin for the third image */
+}
+
+.label-container {
+    grid-row: 2; /* Place label container in the second row */
+    grid-column: 2; /* Place in the second column */
+    align-items: flex-start; /* Align items to the start (left) */
+    text-align: left; /* Align text to the left */
+    display: flex;
+    flex-direction: column;
+    justify-content: top; /* Align items to the top if necessary */
+}
+
+.legendLabel-proportional {
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 16px;
+    margin: 5px 0 20px 0;
+    text-align: left !important; /* Align text to the left */
+}
+
+.legendLabel-proportional:nth-child(2) {
+    margin: 0 0 30px 0; /* Slightly reduced margin for the second image */
+}
+
+.legendLabel-proportional:nth-child(3) {
+    margin: 0 0 28px 0; /* Reduced margin for the third image */
+}
+
+.legendLabel-proportional:nth-child(4) {
+    margin: 0 0 0 0; /* Reduced margin for the third image */
 }
 

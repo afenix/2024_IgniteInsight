@@ -31,6 +31,18 @@ let map;
 let currentYear = dataDates['fire-history'].startYear;
 let geoJson;
 
+// Define thresholds for fire sizes
+const SMALL_FIRE_MAX_ACREAGE = 2500;    // up to 2,500 acres
+const MEDIUM_FIRE_MAX_ACREAGE = 10000;  // up to 10,000 acres
+const LARGE_FIRE_MAX_ACREAGE = 50000;   // up to 50,000 acres
+// Any fire above 50,000 acres is considered a mega fire
+
+// Define fixed sizes for the icons based on proportions
+const BASE_FIRE_SIZE = 16; // Small fire as the visual reference
+const MEDIUM_FIRE_SIZE = BASE_FIRE_SIZE * 1.4;  // 40% increase
+const LARGE_FIRE_SIZE = BASE_FIRE_SIZE * 2.2;  // 80% increase
+const MEGA_FIRE_SIZE = BASE_FIRE_SIZE * 3.4;  // 120% increase
+
 const scrollElement = document.getElementById('map-narrative');
 const wildfireHistorySection = document.getElementById('wildfire-history-section');
 const thresholds = Array.from({ length: 100 }, (_, index) => index * 0.01);
@@ -200,7 +212,7 @@ const createMap = (containerId, center, zoom) => {
     // Initiate the retrieval and display of wildfire points
     loadFireData ();
     createCloroplethLegend();
-
+    createProportionalLegend();
 };
 
 // Function to update the displayed year
@@ -380,43 +392,31 @@ const loadFireData  = async () => {
     }
 };
 
-// Function to add fire data to the map
+/**
+ * Function to add and style fire data to the map
+ * @param {Object} geojsonData - The GeoJSON data containing the fire incident locations and attributes
+ */
 const addFireDataToMap = (geojsonData) => {
     if (window.geoJsonLayer) {
         map.removeLayer(window.geoJsonLayer); // Remove existing layer if it exists
     }
-    let [minValue, maxValue] = determineMinMax(geojsonData.features);
-
-    // create the legend using the min and max values from the filtered year data
-    createProportionalLegend(minValue, maxValue);
 
     window.geoJsonLayer = L.geoJSON(geojsonData, {
         pointToLayer: function (feature, latlng) {
             // Determine fill color based on fire incident type
-            let fillColor;
-            switch (feature.properties.Incid_Type) {
-                case 'Wildfire':
-                    fillColor = '#E85D04'; // Red Orange for Wildfire
-                    break;
-                case 'Prescribed Fire':
-                    fillColor = '#FF9A8C'; // Soft Coral for Prescribed Fire
-                    break;
-                case 'Unknown':
-                        fillColor = '#787878'; // Gray for Unknown
-                        break;
-                case 'Wildland Fire Use':
-                        fillColor = '#82c785'; // Light Green for Beneficial Wildfire/Managed Wildfire
-                        break;
-                default:
-                    fillColor = '#ff7800'; // Gray if type is Unknown
-            }
-            return L.circleMarker(latlng, {
-                radius: calcPropRadius(minValue, feature.properties.BurnBndAc),
-                fillColor: fillColor,
-                color: "#fff",
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8
+            const fireType = feature.properties.Incid_Type;
+            const iconUrl = getIconUrlForFireType(fireType);
+            const iconSize = calcPropRadius(feature.properties.BurnBndAc);
+            // const iconSize = radius * 3;  // Scale icon size based on radius
+
+            const fireIcon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [iconSize, iconSize],
+                className: 'fire-icon'
+            });
+
+            return L.marker(latlng, {
+                icon: fireIcon
             });
         },
         onEachFeature: (feature, layer) => {
@@ -435,16 +435,57 @@ const addFireDataToMap = (geojsonData) => {
     }).addTo(map);
 };
 
-// Function to calculate the radius of the circle marker
-const calcPropRadius = (minValue, burnedAcres) => {
-    // Define a minimum radius for the symbol, to ensure it's always visible
-    const minRadius = 1;
-    // Calculate the radius of the symbol using the Flannery Appearance Compensation formula
-    // This formula is used to adjust the size of the symbol proportionally based on the attribute value
-    const radius = 1.0083 * Math.pow(burnedAcres / minValue, 0.5715) * minRadius;
-    return radius;
+// Helper function to determine icon URL based on fire type
+function getIconUrlForFireType(fireType) {
+    switch (fireType) {
+        case 'Wildfire':
+            return '/img/wildfire_igType2.svg';
+        case 'Prescribed':
+            return '/img/prescribed_igType2.svg';
+        case 'Unknown':
+            return '/img/unknown_igType2.svg';
+        case 'Wildland Fire Use':
+            return '/img/beneficialFire_igType2.svg';
+        case 'Outline':
+            return '/img/fire_outline.svg';
+        default:
+            return '/img/unknown_igType2.svg';
+    }
+}
+
+/**
+ * Calculates the proportional radius of a symbol based on the attribute value.
+ *
+ * @param {number} minValue - The minimum attribute value.
+ * @param {number} burnedAcres - The attribute value for which the radius is calculated.
+ * @returns {number} The calculated radius of the symbol.
+ */
+// const calcPropRadius = (minValue, burnedAcres) => {
+//     // Define a minimum radius for the symbol, to ensure it's always visible
+//     const minRadius = 2;
+//     // Calculate the radius of the symbol using the Flannery Appearance Compensation formula
+//     // This formula is used to adjust the size of the symbol proportionally based on the attribute value
+//     const radius = 1.0083 * Math.pow(burnedAcres / minValue, 0.5715) * minRadius;
+//     return radius;
+// };
+
+const calcPropRadius = (burnedAcres) => {
+    if (burnedAcres <= SMALL_FIRE_MAX_ACREAGE) {
+        return BASE_FIRE_SIZE;
+    } else if (burnedAcres <= MEDIUM_FIRE_MAX_ACREAGE) {
+        return MEDIUM_FIRE_SIZE;
+    } else if (burnedAcres <= LARGE_FIRE_MAX_ACREAGE) {
+        return LARGE_FIRE_SIZE;
+    } else {
+        return MEGA_FIRE_SIZE;
+    }
 };
 
+/**
+ * Sets up the slider and buttons for controlling the years.
+ *
+ * @param {Array} years - An array of years.
+ */
 const setupSliderAndButtons = (years) => {
     const slider = document.getElementById('yearSlider');
     const rangeValueDisplay = document.getElementById('rangeValue');
@@ -489,6 +530,10 @@ const setupSliderAndButtons = (years) => {
     });
 };
 
+/**
+ * Filters the map data by year.
+ * @param {string} year - The year to filter the data by.
+ */
 const filterMapByYear = (year) => {
     fetch(geoJsonPaths["mtbs-fires-pts"])
         .then(response => response.json())
@@ -504,108 +549,95 @@ const filterMapByYear = (year) => {
         });
 };
 
-const calculateClassRanges = (minValue, maxValue) => {
-    const range = maxValue - minValue;
-    const classWidth = range / 3;  // Creating three classes
-    // Return an array of objects, each defining a class range and a label
-    return [
-        { min: minValue, max: minValue + classWidth, label: `${minValue.toLocaleString()} - ${Math.round(minValue + classWidth).toLocaleString()} acres` },
-        { min: minValue + classWidth, max: minValue + 2 * classWidth, label: `${Math.round(minValue + classWidth).toLocaleString()} - ${Math.round(minValue + 2 * classWidth).toLocaleString()} acres`},
-        { min: minValue + 2 * classWidth, max: maxValue, label: `${Math.round(minValue + 2 * classWidth).toLocaleString()} - ${maxValue.toLocaleString()} acres` },
-    ];
-};
-
 /**
- * Function to calculate the minimum and maximum values of a given attribute in a set of GeoJSON features.
- * @param {Array} features - An array of GeoJSON features.
- * @param {string} attribute - The attribute to calculate the minimum and maximum values for.
- * @returns {Array} An array containing the minimum and maximum values of the specified attribute.
+ * Function to create a proportional map legend.
+ * @param {number} minValue - The minimum value for the legend.
+ * @param {number} maxValue - The maximum value for the legend.
+ * @returns {void} - This function does not return any value, it creates a proportional map legend.
  */
-const determineMinMax = (features) => {
-    // Initialize minimum and maximum values to infinity and negative infinity respectively
-    let min = Infinity, max = -Infinity;
-    // Iterate over each feature in the array of GeoJSON features and update the minimum and maximum values accordingly
-    features.forEach(feature => {
-        // Get the value of the specified attribute for the current feature
-        const acres = feature.properties.BurnBndAc;
-        // Update the minimum value if the current value is smaller
-        min = Math.min(min, acres);
-        // Update the maximum value if the current value is larger
-        max = Math.max(max, acres);
-    });
-    // Return an array containing the minimum and maximum values of the specified attribute
-    return [min, max];
-};
-
-/**
- * Function to create a dynamic map legend
- * @param {number} minValue - The minimum value for the legend
- * @param {number} maxValue - The maximum value for the legend
- * @returns {void} - This function does not return any value, it creates a dynamic map legend
- */
-function createProportionalLegend(minValue, maxValue) {
+const createProportionalLegend = () => {
     const legendContainer = document.getElementById('proportional-container');
     legendContainer.innerHTML = '';  // Clear existing content
-    // Calculate the class ranges based on the minimum and maximum values
-    const range = maxValue - minValue;
-    const classWidth = range / 3;  // Creating three classes
-    const classes = [
-        { min: minValue, max: minValue + classWidth, label: `${minValue.toLocaleString()} - ${Math.round(minValue + classWidth).toLocaleString()} acres` },
-        { min: minValue + classWidth, max: minValue + 2 * classWidth, label: `${Math.round(minValue + classWidth).toLocaleString()} - ${Math.round(minValue + 2 * classWidth).toLocaleString()} acres`},
-        { min: minValue + 2 * classWidth, max: maxValue, label: `${Math.round(minValue + 2 * classWidth).toLocaleString()} - ${maxValue.toLocaleString()} acres` },
+
+    // Create and append the header for the Proportional Legend
+    const header = document.createElement('div');
+    header.className = 'column-header-proportional';
+    header.textContent = 'Acres Burned:';
+    legendContainer.appendChild(header);  // Append the header to the container
+
+    // Create icon and label containers
+    const iconContainer = document.createElement("div");
+    iconContainer.className = "icon-container";
+
+    const labelContainer = document.createElement("div");
+    labelContainer.className = "label-container";
+
+    // Define the categories and their labels and sizes
+    const categories = [
+        { label: 'Small: 500-2,5k', size: BASE_FIRE_SIZE },
+        { label: 'Medium: 2.5k-10k', size: MEDIUM_FIRE_SIZE },
+        { label: 'Large: 10k-50k', size: LARGE_FIRE_SIZE },
+        { label: 'Mega: 50k+', size: MEGA_FIRE_SIZE }
     ];
 
-    // Reverse the order of the classes array so the legend will be displayed in the correct order
-    classes.reverse();
+    // Create the legend items for each category
+    categories.forEach(category => {
+        // Use the outline fire icon as the default
+        const defaultFireType = 'Outline'; // Replace with actual default type if different
+        const iconUrl = getIconUrlForFireType(defaultFireType);
 
-    // Create the legend-item container
-    classes.forEach(cls => {
-        const radius = calcPropRadius(minValue, (cls.max + cls.min) / 2);
-        // Create the legend-item container
-        const itemContainer = document.createElement("div");
-        itemContainer.className = "legend-item-proportional";
+        // Create an img element for the fire icon
+        const legendIcon = document.createElement('img');
+        legendIcon.src = iconUrl;
+        legendIcon.style.width = legendIcon.style.height = `${category.size}px`; // Fixed size for each category
+        iconContainer.appendChild(legendIcon);  // Append the icon to the icon container
 
-        // Create the circle and value elements
-        const legendCircle = document.createElement('div');
-        legendCircle.className = 'legendCircle-proportional';
-        legendCircle.style.width = legendCircle.style.height = `${radius * 2}px`;
-        let legendValue = document.createElement('div');
-        legendValue.className = 'legendValue-proportional';
-        legendValue.textContent = cls.label;
-        //legendCircle.append(legendValue);
-
-        // Append elements in the correct hierarchy
-        itemContainer.appendChild(legendCircle);
-        itemContainer.appendChild(legendValue);
-        legendContainer.appendChild(itemContainer);
+        // Create a div for the label
+        const legendLabel = document.createElement('div');
+        legendLabel.className = 'legendLabel-proportional';
+        legendLabel.textContent = category.label;
+        labelContainer.appendChild(legendLabel);  // Append the label to the label container
     });
-}
 
+    // Append icon and label containers to the legend container
+    legendContainer.appendChild(iconContainer);
+    legendContainer.appendChild(labelContainer);
+};
+
+/**
+ * Function to create a cloropleth map legend.
+ * @returns {void} - This function does not return any value, it creates a proportional map legend.
+ */
 const createCloroplethLegend = () => {
     const legendContainer = document.getElementById('cloropleth-container');
-    legendContainer.innerHTML = ''; // Clear existing content
+    // Create and append the header for the Cloropleth Legend
+    const header = document.createElement('div');
+    header.className = 'column-header-cloropleth';
+    header.textContent = 'Ignition Types:';
+    legendContainer.appendChild(header);  // Append the header to the container
 
     const classes = [
-        { label: 'Wildfire', color: '#E85D04' },
-        { label: 'Prescribed Fire', color: 'yellow' },
-        { label: 'Wildland Fire Use', color: '#82c785' },
-        { label: 'Unknown', color: '#787878' },
+        { label: 'Wildfire', iconUrl: '/img/wildfire_igType2.svg' },
+        { label: 'Prescribed Fire', iconUrl: '/img/prescribedFire_igType2.svg' },
+        { label: 'Wildland Fire Use', iconUrl: '/img/beneficialFire_igType2.svg' },
+        { label: 'Unknown', iconUrl: '/img/unknown_igType2.svg' },
     ];
 
     classes.forEach(cls => {
         const itemContainer = document.createElement("div");
         itemContainer.className = "legend-item-cloropleth";
 
-        const legendCircle = document.createElement('div');
-        legendCircle.className = 'legendCircle-cloropleth';
-        legendCircle.style.width = legendCircle.style.height = '30px';
-        legendCircle.style.backgroundColor = cls.color;
+        // Use an SVG image instead of a colored circle
+        const legendIcon = document.createElement('img');
+        legendIcon.src = cls.iconUrl;
+        legendIcon.style.width = legendIcon.style.height = '40px';  // Adjust size as necessary
 
         const legendValue = document.createElement('div');
         legendValue.className = 'legendValue-cloropleth';
         legendValue.textContent = cls.label;
 
-        itemContainer.appendChild(legendCircle);
+        // Append the icon and label to the container
+        itemContainer.appendChild(legendIcon);
         itemContainer.appendChild(legendValue);
         legendContainer.appendChild(itemContainer);
     });
