@@ -155,7 +155,7 @@ const createMap = (containerId, center, zoom) => {
     // Define regions to create custom zoom control - include center coordinates and zoom levels
     const regions = {
         'us': { tooltip: 'Zoom to Continental United States', center: [39.828, -98.5], zoom: 4 }, // Continental United States
-        'ak': { tooltip: 'Zoom to Alaska', center: [65.67, -151.626], zoom: 4.5 }, // Alaska
+        'ak': { tooltip: 'Zoom to Alaska', center: [60.67, -151.626], zoom: 4 }, // Alaska
         'pnw': { tooltip: 'Zoom to Pacific Northwest', center: [39.9, -120.5], zoom: 5 }, // Pacific Northwest
         'sw': { tooltip: 'Zoom to Southwest', center: [34.0, -112.0], zoom: 5 }, // Southwest
         'mw': { tooltip: 'Zoom to Midwest', center: [41.0, -93.0], zoom: 5 }, // Midwest
@@ -383,7 +383,6 @@ const loadFireData  = async () => {
         const response = await fetch(geoJsonPaths["mtbs-fires-pts"]);
         const data = await response.json();
         const uniqueYears = extractUniqueYears(data.features);
-        let [minValue, maxValue] = determineMinMax(data.features); // Calculate minimum and maximum burned acres
         // Initialize the slider with these years
         setupSliderAndButtons(uniqueYears);
         filterMapByYear(uniqueYears[0]); // Add the first year's data to the map on page load)
