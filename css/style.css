@@ -20,13 +20,11 @@ html {
     width: calc(100% - 33.33%);
     /* Adjust width to take into account the side-panel-container */
     float: left;
-    /* position: relative; */
 }
 
 #map-title {
     justify-content: center; /* Center elements horizontally */
     width: 100%; /* Make the container take full width of the page */
-    position: absolute; /* Position at the top of the page */
     top: 0;
     left: 0;
     z-index: 1000;
@@ -42,11 +40,50 @@ html {
 .fire-year {
     color: black;
     font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
 }
 
 .total-fire-acres {
     color: black;
     font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+}
+
+.fire-year {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+}
+
+#wildfire-acres {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+}
+
+#prescribed-acres {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+}
+
+#wildland-fire-use-acres {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+}
+
+#unknown-acres {
+    color: black;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
 }
 
 /* ================================================================================== */
@@ -179,6 +216,7 @@ html {
 #splash-welcome {
     color: #E85D04;
     font-size: 36px;
+    font-family: "Reem Kufi Fun", sans-serif; /
 }
 
 .splash-subtitle {
@@ -221,16 +259,14 @@ html {
     font-weight: regular;
     font-size: 25px;
     color: white;
-    border-radius: 10px;
-    margin-bottom: 0px;
+
 }
 
 .welcome-message {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Centers children horizontally in the container */
-    padding: 1em;
+    padding: 0 3em 0 3em;
     font-family: "Reem Kufi Fun", sans-serif;
     font-optical-sizing: auto;
     font-weight: regular;
@@ -238,6 +274,7 @@ html {
     color: white;
     text-align: left;
     border-radius: 10px;
+
 }
 
 #close-splash {
@@ -499,7 +536,7 @@ svg:not(:root) {
     pointer-events: none;
     margin-bottom: 15px;
     transition: opacity 500ms;
-    overflow: hidden;
+    overflow: auto;
     font-size: 14px;
     font-family: "Reem Kufi Fun", sans-serif;
 }
@@ -576,27 +613,37 @@ svg:not(:root) {
     left: 58%;
     bottom: 20px;
     transform: translateX(-50%);
-    background: rgba(252, 252, 252, 0.8);
-    border-radius: 20px;
+    background: rgba(252, 252, 252, 0.2);
     box-shadow: 0px 15px 40px rgba(126, 109, 87, 0.4);
     width: 50%;
-    padding: 0 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    padding: 20px 0 20px 0;
     z-index: 500;
 }
 
-#rangeValue {
+#header-container {
+    display: flex;
+    align-items: center; /* Vertically center the contents */
     position: absolute;
-    bottom: 30%;
+    top: 20px; /* Adjust as needed */
     left: 50%;
     transform: translateX(-50%);
-    font-size: 26px;
+    z-index: 1000;
+}
+
+#header-text {
     font-family: "Reem Kufi Fun", sans-serif;
-    color: black;
+    font-size: 1.5rem;
+    color: white;
+    margin-right: 10px; /* Space between the text and the number */
+}
+
+#range-value {
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 3rem; /* Larger and more pronounced */
+    color: white;
 }
 
 #wildfire-total {
@@ -874,3 +921,11 @@ svg:not(:root) {
     margin: 0 0 0 0; /* Reduced margin for the third image */
 }
 
+
+/* ================================================================================== */
+/* CHART  */
+/* ================================================================================== */
+
+.chart-container {
+    order: 2;
+}
