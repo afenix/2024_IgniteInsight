@@ -32,36 +32,26 @@
     <!-- Splash Screen Welcome Modal -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-modal">
+            <div class="header-container">
+                <img src="img/icons8-wildfire-64.png" alt="Header Icon">
+                <h1 id="splash-welcome">Welcome to Ignite Insights!</h1>
+            </div>
             <div class="welcome-message">
-                <div class="header-container">
-                    <img src="img/icons8-wildfire-64.png" alt="Header Icon">
-                    <h1 id="splash-welcome">Welcome to Ignite Insights!</h1>
-                </div>
                 <h3 class="splash-subtitle">Discover Your Community's Wildfire History</h3>
-                <p>Whether you're a new resident or deeply rooted in your community, understanding
-                    the wildfire risks around you is crucial. Ignite Insights offers a powerful
-                    suite of tools designed to uncover the intricate patterns and causes of
-                    wildfires over the past 40 years.</p>
-                <h3 class="splash-subtitle">Explore and Learn:</h3>
+                <p>Wildfires are becoming more common and impacting communities across the US. This interactive map helps you explore historical wildfire data from 1984 to today. See how fire patterns have changed and gain insights that can help us live alongside these natural events.</p>
+                <h3 class="splash-subtitle">Interactive Learning and Engagement:</h3>
                 <ul>
                     <li>
-                        <b>Interactive Wildfire Timelines:</b> Navigate through time with our
-                        intuitive slider to observe trends in wildfire frequency, size, and causes.
-                        Gain insights into how fire behaviors have shifted due to changes in climate
-                        and land use.
+                        <b>See How Wildfire Patterns Change Over Time:</b> Explore wildfire trends over time and assess potential risks to make informed decisions.
                     </li>
                     <li>
-                        <b>Regional Fire Analysis:</b> Zoom into specific areas to see fire history
-                        and behavior. Understand the factors that contribute to wildfire risks in
-                        different regions to better protect your community.
+                        <b>Uncover Your Region's Unique Fire History:</b> Understand local risks and make decisions that prioritize safety.
                     </li>
                     <li>
-                        <b>Preventive Strategies:</b> Learn about effective wildfire prevention and
-                        management practices. Use historical data to anticipate future risks and
-                        plan accordingly.
+                        <b>Learn How to Protect Your Community:</b> Discover prevention strategies and build a resilient future together.
                     </li>
                 </ul>
-                <h4>Are you ready to turn insights into informed actions?</h4>
+                <h4>Are you ready to embrace a new perspective on wildfires?</h4>
                 <!-- Continue button -->
                 <button id="close-splash">Start Exploring</button>
             </div>
@@ -69,9 +59,10 @@
     </div>
     <!-- Map Container -->
     <div id="map-container">
-        <div id="map-title">
-            <img src="img/icons8-wildfire-64.png" alt="Header Icon">
-            <h1 id="splash-welcome">Ignite Insights</h1>
+        <div id="header-container">
+            <div id="header-text">Year of the Data:</div>
+            <div id="range-value">2023</div> <!-- This will be dynamically updated -->
+        </div>
         <!-- Legend Toggle Button -->
         <div id="legend-toggle" class="legend-toggle">
             <button id="toggle-legend">Close Legend</button>
@@ -85,23 +76,20 @@
         <div id="popup-content" style="display: none;"></div>
         <div id="slider-container">
             <div id="slider" class="slider">
-                <p id="rangeValue"></p>
                 <button class="button" id="reverse"><svg xmlns="http://www.w3.org/2000/svg"
-                        width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
+                        width="16" height="16" fill="white" class="bi bi-chevron-left"
                         viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                     </svg></button>
                 <input class='range' id="yearSlider" type='range' min="0" max="39" step="1">
                 <button class="button" id="forward"><svg xmlns="http://www.w3.org/2000/svg"
-                        width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
+                        width="16" height="16" fill="white" class="bi bi-chevron-right"
                         viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
                     </svg></i></button>
             </div>
-            <div id="wildfire-total"><span id="fire-acres"></span> acres were affected by wildfires
-                in the U.S.</div>
         </div>
     </div>
 
@@ -109,86 +97,115 @@
     <div id="side-panel-container">
         <div id="map-narrative">
             <section id="summary-section">
-                <h2><span class="fire-year"></span> - <span class="total-fire-acres"></span> total acres burned</h2>
-                <p>In <span class="fire-year"></span> a total of <span class="total-fire-acres"></span>
-                    acres were affected by fires across the U.S.</p>
-                <p>Of those acres, <b><span id="wildfire-acres"></span></b> acres were wildfires. Whereas,
-                    <b><span id="prescribed-acres"></span></b> were prescribed burns, and <b><span
-                        id="wildland-fire-use-acres"></span></b> acres were wildland fire use. The
-                    remaining <b><span id="unknown-acres"></span></b> were of unknown origin.
+                <div id="map-title">
+                    <img src="img/icons8-wildfire-64.png" alt="Header Icon">
+                    <h1 id="splash-welcome">Ignite Insights</h1>
+                </div>
+                <h3 style="margin-top: 0">Summary of Current Fire Data</h3>
+                <p>In <span class="fire-year"></span> alone, a staggering <span
+                        class="total-fire-acres"></span> acres across the United States were
+                    affected by fires, underscoring the vast and varied impact of wildfires. Of
+                    these, <b><span id="wildfire-acres"></span></b> acres were wildfires, which are
+                    largely unplanned events typically sparked by natural phenomena such as
+                    lightning. Additionally,
+                    <b><span id="prescribed-acres"></span></b> acres were managed through prescribed
+                    burns, a proactive fire management technique aimed at reducing wildfire risks
+                    and maintaining healthy ecosystems. <b><span
+                            id="wildland-fire-use-acres"></span></b> acres were attributed to
+                    wildland fire use—a strategy that allows fires started naturally to burn under
+                    controlled conditions—while <b><span id="unknown-acres"></span></b> acres burned
+                    due to causes of unknown origin.
+                </p>
+                <p>As you navigate through our interactive map and adjust the range slider to
+                    explore different years, these figures will update to reflect the annual
+                    fluctuations in fire activity and management practices. This dynamic data serves
+                    as a gateway into understanding the historical and evolving complexity of
+                    wildfires in the United States, highlighting the integral role of fire in
+                    shaping natural landscapes and prompting shifts in both policy and perspective
+                    towards fire management.</p>
+            </section>
+            <section id="introduction">
+                <h2>Introduction</h2>
+                <p>Wildfires, a dynamic force of nature, have shaped the landscapes and ecosystems
+                    across the United States for millennia. This narrative, visualized through an
+                    interactive map tracking wildfires from 1984 to today, explores the increasing
+                    frequency and intensity of these events, delving into their natural roles, the
+                    impact of human actions, and the intertwined effects of climate change and land
+                    management practices.
                 </p>
             </section>
-            <section id="wildfire-history-section">
-                <h2>Wildfire History</h2>
-                <p><b>Early Records and Observations:</b> Historically, wildfires have always been a
-                    natural part of the ecosystems in the Western United States, particularly in
-                    areas dominated by forests and shrublands adapted to fire. Indigenous peoples
-                    used fire as a land management tool for thousands of years, influencing fire
-                    regimes in significant ways.
-                    <br><br><b>20th Century:</b> With the establishment of modern fire suppression
-                    policies in the early 20th century, particularly after devastating events like
-                    the 1910 "Big Blowup" which burned about 3 million acres across Idaho, Montana,
-                    and Washington, the approach to wildfires shifted dramatically. The U.S.
-                    government began a policy of aggressive fire suppression, which reduced the
-                    number of fires in the short term but also led to an accumulation of undergrowth
-                    and dead wood, which are significant fuels for fires.
-                    <br><br><b>Late 20th Century to Present:</b> From the 1980s onward, there has
-                    been a noticeable increase in the number and size of wildfires. Research
-                    indicates that this change is driven by a combination of factors including past
-                    fire suppression policies, increased human settlement in fire-prone areas
-                    (urban-wildland interface), and climate change impacts such as warmer
-                    temperatures, earlier snowmelt, and longer dry seasons.
+            <section id="historical-context">
+                <h2>Historical Context and Indigenous Wisdom</h2>
+                <p>Long before modern land management practices were established, Native and
+                    Indigenous communities recognized the ecological benefits of wildfires. They
+                    employed controlled burns to manage the landscape, enhance plant and animal
+                    habitats, promote biodiversity, and reduce the risk of larger, uncontrolled
+                    fires. This traditional ecological knowledge highlights a stark contrast to the
+                    more recent policies of fire suppression that have dominated the past century,
+                    contributing to the current challenges.</p>
+                <h4>The Legacy of Suppression and its Repercussions</h4>
+                <p>The suppression policies implemented in the 20th century have led to significant
+                    ecological imbalances. Accumulated forest debris and the lack of regular,
+                    natural fires have resulted in more severe and destructive wildfires. These
+                    fires not only threaten human lives and properties but also cause long-term
+                    ecological damage, such as soil sterilization and the destruction of
+                    fire-adapted species.
                 </p>
+                <h4>Climate Change: Intensifying the Fire Regime</h4>
+                <p>Climate change has exacerbated the conditions conducive to wildfires. Warmer
+                    temperatures, shifting precipitation patterns, and outbreaks of pests weakened
+                    by climate stresses have made forests more vulnerable to catastrophic fires. The
+                    interactive map starkly illustrates the expansion and intensity of wildfires
+                    over the decades, underscoring the urgent need for adaptive management
+                    strategies.
+                </p>
+            <section id="oppotunties-humility">
+                <h4>Expanding Human Frontiers: The Wildland-Urban Interface</h4>
+                <p>The increasing encroachment of human settlements into fire-prone areas, known as
+                    the Wildland-Urban Interface (WUI), complicates fire management. This expansion
+                    increases the stakes of wildfire management, demanding innovative approaches to
+                    reduce risk to both human and ecological communities.</p>
+                <h4>Understanding Fire Types and Their Management</h4>
+                <ul>
+                    <li><b>Wildfires:</b> Typically unplanned, these natural occurrences such as
+                        those started by lightning are unpredictable and can be devastating.</li>
+                    <li><b>Wildfires:</b> Typically unplanned, these natural occurrences such as
+                        those started by lightning are unpredictable and can be devastating.</li>
+                    <li><b>Prescribed Burns:</b> These are intentional fires set under controlled
+                        conditions to manage vegetation, reduce wildfire risk, and restore health to
+                        ecosystems.</li>
+                    <li><b>Wildland Fire Use:</b> This management strategy allows naturally ignited
+                        fires to burn under close monitoring to achieve specific ecological
+                        benefits.</li>
+                </ul>
+                <h4>Relearning from Indigenous Practices:</h4>
+                <p>Incorporating the deep-rooted wisdom of Indigenous fire management practices
+                    offers valuable lessons for today’s wildfire challenges. Recognizing and
+                    integrating Indigenous perspectives can lead to more effective and sustainable
+                    fire management strategies that honor cultural heritage and ecological
+                    necessity. Active collaboration with Native and Indigenous communities in
+                    shaping and guiding wildfire management policies is crucial for developing
+                    practices that are ecologically sound and culturally respectful.</p>
             </section>
-            <section id="wui">
-                <h2>Definition and Importance of WUI</h2>
-                <p>The Wildland-Urban Interface (WUI) is defined as areas where human-made
-                    structures and infrastructure (homes, businesses, etc.) are in or adjacent to
-                    areas prone to wildland fire. This interface has become a focal point for
-                    wildfire management because it's where human populations and infrastructure are
-                    most at risk from wildfires.</p>
-                <h4>Historical Context and Development</h4>
-                <p><br><br><b>Early Development:</b> In the early and mid-20th century, the
-                    expansion of urban areas into wildland areas was relatively limited. However, as
-                    population growth accelerated in the Western U.S., more communities began to
-                    develop in fire-prone landscapes, particularly in states like California,
-                    Colorado, and Arizona.
-                    <br><br><b>Late 20th Century:</b> By the 1980s and 1990s, there was a
-                    significant increase in the development of the WUI. This growth was driven by a
-                    desire for scenic vistas, privacy, and a closeness to nature. However, this
-                    expansion led to increased vulnerability to wildfires as more people and
-                    property were situated in areas with a high fire risk.
-                </p>
-                <h4>Trends and Changes</h4>
-                <p><br><br><b>Population Growth:</b> The population in WUI regions has continued to
-                    grow rapidly. From 1990 to 2010, the number of new homes built in WUI areas was
-                    significantly higher than in non-WUI areas, underscoring the desirability of
-                    these regions despite their risks.
-                    <br><br><b>Increasing Wildfire Risks:</b> As more people move into WUI areas,
-                    the risk of wildfires increases, not only because there are more ignition points
-                    (like vehicles, power lines, and residential activities) but also because fire
-                    suppression becomes harder. Wildfires that reach these populated areas are more
-                    challenging to manage and pose higher risks to human life and property.
-                </p>
-                <h4>Impact of WUI on Wildfire Management and Policy</h4>
-                <p>The growth of WUI areas has significant implications for wildfire management
-                    policies and practices:</p>
-                <p><br><br><b>Fire Management Practices: </b> here has been a shift towards more
-                    integrated fire management practices, including prescribed burns (controlled
-                    fires used to manage vegetation) and the creation of defensible spaces around
-                    properties.
-                    <br><br><b>Building and Zoning Regulations: </b> Many states and local
-                    governments in the Western U.S. have updated building codes and zoning
-                    regulations to improve fire resistance in WUI areas. These include requiring
-                    fire-resistant building materials and creating regulations that require
-                    homeowners to manage vegetation around their properties.
-                </p>
+            <section id="conclusion">
+                <h4>Conclusion: A Call for Integrated Management and Cooperation</h4>
+                <p>As we move forward, it is imperative that we rethink our relationship with
+                    wildfires. Our interactive map not only traces the history of wildfires but also
+                    serves as a call to action for integrated management approaches that include
+                    prescribed burns, respectful incorporation of traditional Indigenous practices,
+                    and innovative land management strategies. By doing so, we can transform our
+                    interactions with these natural processes from adversarial to cooperative,
+                    ensuring healthier ecosystems and safer human communities.</p>
+                <h4>Closing</h4>
+                <p>This narrative and the accompanying map invite viewers to explore the complex
+                    relationship between humans and wildfires. By understanding this dynamic, we can
+                    foster a collective approach to fire management that respects our past, secures
+                    our present, and safeguards our future.</p>
             </section>
         </div>
-        <div class="legend-container">
+        <div class="chart-container">
             <div class="columns-wrapper">
-                <div id="cloropleth-container"></div>
-                <div id="proportional-container"></div>
+                <svg id="wildfireChart" width="400" height="200"></svg>
             </div>
         </div>
     </div>
@@ -224,35 +241,64 @@
         </ul>
         <div class="sidebar-content">
             <div class="item-content" id="menu">
-                <h1 class="main-title">Explore Vandalism Trends Through Time</h1>
+                <h1 class="main-title">How to Navigate Ignite Insights</h1>
                 <br class="content">
-                <h2>How to Navigate Ignite Insights</h2>
-                <br>
-                <p class="attribution">Favicon by <a target="_blank"
-                        href="https://icons8.com/icon/UJcE6K1qaeAT/wildfire">Wildfire</a> icon by <a
-                        target="_blank" href="https://icons8.com">Icons8</a>
-                <p>Welcome to your interactive guide to understanding wildfires and their impacts.
-                    Our platform is designed to visually connect you with extensive wildfire data as
-                    you explore the content in our side panel. Here’s how to get the most out of
-                    Ignite Insights::</p>
-                <br>
-                <li><strong>Interactive Map & Side Panel Sync:</strong> As you scroll through the
-                    sections on the right, the map on the left will dynamically update to reflect
-                    the information and data ranges you’re reading about. This synchronized
-                    interaction helps you see the real-time impact of the data being discussed.</li>
-                </br>
-                <li><strong>Exploring Wildfire History:</strong> croll to ‘Wildfire History’: As you
-                    read about changes in wildfire trends over the years, the map will display the
-                    boundaries of historical wildfires from 1984 to 2022. Use the time slider below
-                    the map to adjust the years and observe changes directly.
-                </li></br>
-                <li><strong>Understanding WUI Expansion:</strong>Move to the ‘WUI Data’ Section:
-                    When you reach this topic, the map will shift to show the Wildland-Urban
-                    Interface data, illustrating how these boundaries have expanded over time.
-                </li></br>
-                <li><strong>Navigation Controls:</strong>Use the panel on the right to navigate
-                    through topics. The map will automatically adjust to show the relevant data as
-                    you move between sections.</li>
+                <p>Welcome! This interactive map tracks wildfires across the United States from 1984 to today. Witness how these dynamic natural phenomena have evolved over the last forty years and learn how we can adapt to live in harmony with them. Together, we can embrace the challenge of coexisting with wildfires and create a brighter future for ourselves and the planet.</p>
+                <h4>Here’s how to get the most out of Ignite Insights:</h4>
+                <li><strong>Exploring Wildfire History:</strong> Use the time slider below
+                    the map to adjust the years and observe changes directly. As you move through the years the "Summary of Current Fire Data" will be updated at the top of the side panel.</li>
+                </li>
+                <li><strong>Learn about specific fire events</strong> by clicking or hovering on individual fire map
+                    markers.
+                </li>
+                <li><strong>Navigation Controls:</strong> Explore various regions in the U.S. by using the multiple navigation controls on teh left of the map. Clicking on "+" or "-" will zoom in or out of the map. There are also custom regional zoom options for:</li>
+                    <ul>
+                        <li>
+                            Home: Zooms out to the full map view.
+                        </li>
+                        <li>
+                            Zoom to your location: Zooms in to your current location. Must allow the browser to allow this.
+                        </li>
+                        <li>
+                            US: Zooms in to the full United States view.
+                        </li>
+                        <li>
+                            PNW: Zooms in to the Pacific Northwest region.
+                        </li>
+                        <li>
+                            SW: Zooms in to the Southwest region.
+                        </li>
+                        <li>
+                            MW: Zooms in to the Midwest region.
+                        </li>
+                        <li>
+                            NE: Zooms in to the Northeast region.
+                        </li>
+                        <li>
+                            SE: Zooms in to the Southeast region.
+                        </li>
+                        <li>
+                            AK: Zooms in to Alaska.
+                        </li>
+                    </ul>
+                </ul>
+                <h4>Acknowledgements</h4>
+                <p>Building this site was a labor of love, made possible by the incredible contributions of others. Sites like this wouldn't exist without the countless hours of others building libraries, sharing knowledge, and providing data.  Special thanks go out to:</p>
+                <ul>
+                    <li><b>Leaflet, D3, Stadia Maps, and the MTBS program</b> for their invaluable mapping and data resources.</li>
+                    <li><b>UW Madison</b> for their ongoing support in my learning journey.</li>
+                    <li><b>My partner Megan Joanne Keller❤️</b> for her endless encouragement and support.</li>
+
+                </ul>
+                <h4>Attribution</h4
+                <ul></ul>
+                    <li>The historic wildfire data comes from  <a target="_blank"
+                        href="https://mtbs.gov/">MTBS (Monitoring Trends in Burn Severity) program</a>
+                    </li>
+                    <li>Favicon by <a target="_blank"
+                            href="https://icons8.com/icon/UJcE6K1qaeAT/wildfire">Wildfire</a>,  icon by <a
+                            target="_blank" href="https://icons8.com">Icons8</a></p>
+                    </li>
                 </ul>
             </div>
         </div>
