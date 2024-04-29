@@ -66,7 +66,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-// Function to instantiate the Leaflet map
+document.getElementById('toggle-legend').addEventListener('click', function() {
+    var legend = document.querySelector('.legend-container');
+    var button = document.getElementById('toggle-legend');
+
+    // Toggle visibility
+    if (legend.style.display === 'none') {
+        legend.style.display = 'block';
+        button.textContent = 'Close Legend'; // Change button text to indicate action
+    } else {
+        legend.style.display = 'none';
+        button.textContent = 'Open Legend'; // Change button text to indicate action
+    }
+});
+
+// Initialize the legend as visible or hidden based on preference
+document.querySelector('.legend-container').style.display = 'block';
+
+// Function to instantiate the Leaflet map and custom controls
 const createMap = (containerId, center, zoom) => {
     // Create the map and set its initial view to the specified coordinates and zoom level
     map = L.map(containerId, {

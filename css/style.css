@@ -709,13 +709,9 @@ svg:not(:root) {
 /* LEGEND */
 /* ================================================================================== */
 
-/* ================================================================================== */
-/* LEGEND */
-/* ================================================================================== */
-
 .legend-container {
+    transition: all 0.3s ease; /* Smooth transition for toggling visibility */
     order: 2;
-    width: 95%;
     display: flex;
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Center items horizontally within the container */
@@ -723,6 +719,28 @@ svg:not(:root) {
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    position: absolute; /* Position it absolutely within its parent */
+    bottom: 50px; /* Distance from the bottom edge */
+    right: 20px;  /* Distance from the left edge */
+}
+
+.legend-toggle {
+    position: absolute;
+    bottom: 50px; /* Align with the bottom of the legend */
+    right: 20px; /* Align with the left of the legend */
+    z-index: 1001; /* Ensure it's above the legend */
+}
+
+#toggle-legend {
+    cursor: pointer;
+    padding: 5px;
+    margin: 5px;
+    background-color: #ff5100;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 12px;
 }
 
 #legend-title {
@@ -737,12 +755,14 @@ svg:not(:root) {
 .columns-wrapper {
     display: flex;
     justify-content: space-between; /* Space items equally horizontally */
+    /* width: 100%; Match width to the parent container */
+    flex-direction: column; /* Stack elements vertically */
     width: 100%; /* Match width to the parent container */
 }
 
 
 #cloropleth-container {
-    width: 40%;
+    /* width: 40%; */
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -776,7 +796,7 @@ svg:not(:root) {
 }
 
 #proportional-container {
-    width: 55%;
+    /* width: 55%; */
     display: grid; /* Use grid layout */
     grid-template-columns: auto 1fr; /* Single column for the entire container */
     grid-template-rows: auto auto 1fr;  /* Row for header, row for icons/labels, flexible row for content */
