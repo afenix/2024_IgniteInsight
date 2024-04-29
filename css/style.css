@@ -135,6 +135,15 @@ html {
     opacity: 0.8;
  }
 
+.leaflet-tooltip {
+    font-family: "Reem Kufi Fun", sans-serif; /* Your desired font */
+    font-size: 14px; /* Adjust font size if needed */
+    background-color: rgba(255, 255, 255, 0.9);  /* Semi-transparent background */
+    border: 1px solid #333; /* Optional border */
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4); /* Optional shadow */
+    padding: 20px;
+}
+
 /* ================================================================================== */
 /* Splash Screen  */
 /* ================================================================================== */
