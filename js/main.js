@@ -330,10 +330,17 @@ const loadFireData  = async () => {
     try {
         const response = await fetch(geoJsonPaths["mtbs-fires-pts"]);
         const data = await response.json();
+         // 1. Extract unique years and initialize the slider
         const uniqueYears = extractUniqueYears(data.features);
-        // Initialize the slider with these years
         setupSliderAndButtons(uniqueYears);
-        filterMapByYear(uniqueYears[0]); // Add the first year's data to the map on page load)
+
+        // 2. Create line chart data
+        const lineChartData = createLineChartData(data);
+        createLineChart(lineChartData);
+
+        // 3. Load the initial year's data
+        filterMapByYear(uniqueYears[0]);
+
     } catch (error) {
         console.error("Failed to load or process geojson:", error);
     }
@@ -501,12 +508,20 @@ const filterMapByYear = (year) => {
                 type: 'FeatureCollection',
                 features: data.features.filter(feature => feature.properties.Ig_Date?.substring(0, 4) === year)
             };
+            // Clear old data (if any)
+            if (window.geoJsonLayer) {
+                map.removeLayer(window.geoJsonLayer);
+            }
+// TODO: CONNECT THE CHART WITH THE MAP
+            // Update line chart highlight
+            //highlightYearInChart(year);
+
             addFireDataToMap(filteredData);
+
             // Calculate total acres burned for the year
             let yearSumAcres = calculateTotalAcresByYear(filteredData);
-
             // Update the map title with the total acres burned for the year
-            updateMapTitle(yearSumAcres, year);
+            updateElementsOnPage(yearSumAcres, year);
         })
         .catch(error => {
             console.error("Error filtering data:", error);
@@ -642,7 +657,7 @@ const calculateTotalAcresByYear = (geojsonData) => {
  * @param {number} acres - The number of acres to display in the map title.
  * @returns {void}
  */
-const updateMapTitle = (yearData, year) => {
+const updateElementsOnPage = (yearData, year) => {
     console.log('yearData:', yearData);
     // Check if data for the specific year is available
     if (!yearData[year]) {
@@ -778,4 +793,78 @@ const closeSidebar = () => {
     if (!element) return;
     element.classList.remove("active-item");
     activeContent.classList.remove("active-content");
+}
+
+const createLineChartData = (geojsonData) => {
+    const wildfireData = calculateTotalAcresByYear(geojsonData);
+    const data = Object.keys(wildfireData).map(year => ({
+        year: year,
+        totalAcres: wildfireData[year].totalAcres,
+        wildfire: wildfireData[year]['Wildfire'],
+        prescribed: wildfireData[year]['Prescribed Fire'],
+        unknown: wildfireData[year]['Unknown'],
+        wildlandFireUse: wildfireData[year]['Wildland Fire Use'],
+
+    }));
+    return data;
+};
+
+
+//-------------------------------------------------------------------------------------------------------------
+
+//-------------------   D3 LINE CHART        -----------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------
+const createLineChart = (data) => {
+    const svg = d3.select('#wildfireChart');
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const width = +svg.attr('width') - margin.left - margin.right;
+    const height = +svg.attr('height') - margin.top - margin.bottom;
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+    // Set the ranges
+    const x = d3.scaleTime().range([0, width]);
+    const y = d3.scaleLinear().range([height, 0]);
+
+    // Define the line
+    const line = d3.line()
+        .x(d => x(new Date(d.year, 0, 1)))
+        .y(d => y(d.totalAcres));
+console.log('line', line);
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, d => new Date(d.year, 0, 1)));
+    y.domain([0, d3.max(data, d => d.totalAcres)]);
+
+    // Add the valueline path.
+    g.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("d", line);
+
+    // Add the X Axis
+    g.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.timeFormat("%Y")));
+
+    // Add the Y Axis
+    g.append("g")
+        .call(d3.axisLeft(y));
+};
+
+const highlightYearInChart = (selectedYear) => {
+    g.selectAll(".highlight").remove(); // Remove old highlights
+    g.append("circle") // Add a new highlight
+        .attr("class", "highlight")
+        .attr("cx", x(new Date(selectedYear, 0, 1)))
+        .attr("cy", y(data.find(d => d.year === selectedYear).totalAcres))
+        .attr("r", 5)
+        .style("fill", "red");
+    g.selectAll("dot")
+        .data(data)
+        .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", d => x(new Date(d.year, 0, 1)))
+        .attr("cy", d => y(d.totalAcres))
+        .on("click", d => updateMapToYear(d.year));
 }
