@@ -43,11 +43,6 @@ const MEDIUM_FIRE_SIZE = BASE_FIRE_SIZE * 1.4;  // 40% increase
 const LARGE_FIRE_SIZE = BASE_FIRE_SIZE * 2.2;  // 80% increase
 const MEGA_FIRE_SIZE = BASE_FIRE_SIZE * 3.4;  // 120% increase
 
-const scrollElement = document.getElementById('map-narrative');
-const wildfireHistorySection = document.getElementById('wildfire-history-section');
-const thresholds = Array.from({ length: 100 }, (_, index) => index * 0.01);
-let isHistorySectionVisible = false;
-
 // Add event listeners for splash screen and sidebar panel behavior
 document.addEventListener('DOMContentLoaded', function () {
     const splashScreen = document.getElementById('splash-screen');
@@ -55,9 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.getElementById('toggle-panel-btn');
 
     createMap(mapParams.containerID, mapParams.center, mapParams.zoom);
-
-    // Set up Intersection Observer for sidebar panel scrolling events
-    setUpIntersectionObserver();
 
     // Add event listener to close the splash screen when the close button is clicked
     closeButton.addEventListener('click', function () {
@@ -72,28 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach the event listener to the toggle button and fire the toggle function when the close button is clicked
     toggleBtn.addEventListener('click', toggleSidePanelAndAdjustMap);
 
-    // Event listener for scrolling events
-    scrollElement.addEventListener('scroll', function() {
-        if (isHistorySectionVisible) {
-            const sectionHeight = wildfireHistorySection.clientHeight;
-            const scrollPosition = this.scrollTop; // Top of the scrollable section
-            const scrollHeight = this.scrollHeight; // Total scrollable height
-            const visibleHeight = this.clientHeight; // Height of the visible part of the sidebar
-
-            // Calculate the scroll percentage
-            const scrollPercentage = scrollPosition / (scrollHeight - visibleHeight);
-
-            // Calculate the current year based on scroll percentage
-            const yearRange = dataDates['fire-history'].endYear - dataDates['fire-history'].startYear;
-            const scrolledYear = Math.round(dataDates['fire-history'].startYear + scrollPercentage * yearRange);
-
-            if (scrolledYear !== currentYear) {
-                currentYear = scrolledYear;
-                updateYearDisplay(currentYear);
-                addFireBoundariesByTime(currentYear);
-            }
-        }
-    });
 });
 
 // Function to instantiate the Leaflet map
@@ -215,35 +185,6 @@ const createMap = (containerId, center, zoom) => {
     createProportionalLegend();
 };
 
-// Function to update the displayed year
-const updateYearDisplay = (year) => {
-    const yearDisplay = document.getElementById('rangeValue');
-    yearDisplay.textContent = year;
-};
-
-
-// Intersection Observer setup function
-const setUpIntersectionObserver = () => {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                isHistorySectionVisible = true;
-                // Trigger immediate update to display start year data
-                addFireBoundariesByTime(dataDates['fire-history'].startYear);
-                console.log('HI: ' + dataDates['fire-history'].startYear);
-            } else {
-                isHistorySectionVisible = false;
-                // Optional: clear data or reset state as the section exits the viewport
-            }
-        });
-    }, {
-        root: null, // viewport
-        rootMargin: '0px',
-        threshold: 0.1 // adjust this value based on how much of the section must be visible to trigger
-    });
-    observer.observe(wildfireHistorySection);
-};
-
 // Function to toggle the side panel and adjust the map
 const toggleSidePanelAndAdjustMap = (event) => {
     const sidePanel = document.getElementById('side-panel-container');
@@ -272,34 +213,7 @@ const toggleSidePanelAndAdjustMap = (event) => {
     }, 300); // Adjust timeout duration
 }
 
-// Highlight features on the map based on their class name
-// const highlightFeatures = (className) => {
-//     geoJson.eachLayer((layer) => {
-//         if (layer.options.className === className) {
-//             //TODO: Add logic to only restyle classes that don't match so they fade to the background
-//             // increasing the visual affordance for the highlighted class.
-//             //layer.setStyle({ fillColor: 'purple' }); // Or a different highlight style
-//         }
-//     });
-// }
 
-// // Reset the style of all features on the map
-// const resetFeatureStyles = () => {
-//     geoJson.eachLayer((layer) => {
-//         // Reset the style back to the original
-//         layer.setStyle({ fillColor: '#ff7800' });
-//     });
-// }
-
-// function updateLegendForYear(year) {
-//     const { minValue, maxValue } = calcYearMinMax(geoJson, year);
-//     const legendContainer = document.getElementById('legend');
-//     // Clear existing legend items
-//     legendContainer.innerHTML = '';
-
-//     // Recreate legend items based on the current year's data
-//     createProportionalLegend(minValue, maxValue); // Assuming createProportionalLegend is adaptable to dynamic ranges
-// }
 //====================================================================================================
 //====================================================================================================
 //====================================================================================================
@@ -310,8 +224,16 @@ const toggleSidePanelAndAdjustMap = (event) => {
 //     updateTotalVandalismCountDisplay(year);
 //     updateMapDescription(year);
 // }
+//====================================================================================================
+//====================================================================================================
+//====================================================================================================
 
-// Function to fetch and display the historical wildfire data by year
+
+/**
+ * Fetches and displays fire boundaries for a specific year.
+ * @param {number} year - The year for which to fetch and display fire boundaries.
+ * @returns {Promise<void>} - A promise that resolves when the fire boundaries are fetched and displayed.
+ */
 const addFireBoundariesByTime = async (year) => {
     try {
         const response = await fetch(geoJsonPaths["mtbs-fires-poly"]);
@@ -365,7 +287,12 @@ const addFireBoundariesByTime = async (year) => {
     }
 };
 
-// Extract All Unique Years from the MBTS GeoJSON
+
+/**
+ * Extracts unique years from an array of features.
+ * @param {Array} features - The array of features.
+ * @returns {Array} - An array of unique years sorted in ascending order.
+ */
 const extractUniqueYears = (features) => {
     const years = new Set();
     features.forEach(feature => {
@@ -378,6 +305,10 @@ const extractUniqueYears = (features) => {
     return Array.from(years).sort();
 };
 
+/**
+ * Loads fire data from a specified geoJsonPath and performs kicks off the process to filter and display the data.
+ * @returns {Promise<void>} A promise that resolves when the fire data is loaded and processed.
+ */
 const loadFireData  = async () => {
     try {
         const response = await fetch(geoJsonPaths["mtbs-fires-pts"]);
@@ -434,8 +365,13 @@ const addFireDataToMap = (geojsonData) => {
     }).addTo(map);
 };
 
-// Helper function to determine icon URL based on fire type
-function getIconUrlForFireType(fireType) {
+/**
+ * Returns the URL of an icon based on the given fire type.
+ *
+ * @param {string} fireType - The type of fire.
+ * @returns {string} The URL of the corresponding icon.
+ */
+const getIconUrlForFireType = (fireType) => {
     switch (fireType) {
         case 'Wildfire':
             return '/img/wildfire_igType2.svg';
@@ -453,21 +389,10 @@ function getIconUrlForFireType(fireType) {
 }
 
 /**
- * Calculates the proportional radius of a symbol based on the attribute value.
- *
- * @param {number} minValue - The minimum attribute value.
- * @param {number} burnedAcres - The attribute value for which the radius is calculated.
- * @returns {number} The calculated radius of the symbol.
+ * Calculates the proportional radius based on the burned acres.
+ * @param {number} burnedAcres - The number of burned acres.
+ * @returns {number} The proportional radius.
  */
-// const calcPropRadius = (minValue, burnedAcres) => {
-//     // Define a minimum radius for the symbol, to ensure it's always visible
-//     const minRadius = 2;
-//     // Calculate the radius of the symbol using the Flannery Appearance Compensation formula
-//     // This formula is used to adjust the size of the symbol proportionally based on the attribute value
-//     const radius = 1.0083 * Math.pow(burnedAcres / minValue, 0.5715) * minRadius;
-//     return radius;
-// };
-
 const calcPropRadius = (burnedAcres) => {
     if (burnedAcres <= SMALL_FIRE_MAX_ACREAGE) {
         return BASE_FIRE_SIZE;
