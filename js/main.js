@@ -328,42 +328,60 @@ const loadFireData  = async () => {
  */
 const addFireDataToMap = (geojsonData) => {
     if (window.geoJsonLayer) {
-        map.removeLayer(window.geoJsonLayer); // Remove existing layer if it exists
+        map.removeLayer(window.geoJsonLayer);
     }
 
+    const tooltip = L.tooltip({ sticky: true }); // Create the tooltip here
+
     window.geoJsonLayer = L.geoJSON(geojsonData, {
-        pointToLayer: function (feature, latlng) {
-            // Determine fill color based on fire incident type
-            const fireType = feature.properties.Incid_Type;
-            const iconUrl = getIconUrlForFireType(fireType);
-            const iconSize = calcPropRadius(feature.properties.BurnBndAc);
-            // const iconSize = radius * 3;  // Scale icon size based on radius
-
-            const fireIcon = L.icon({
-                iconUrl: iconUrl,
-                iconSize: [iconSize, iconSize],
-                className: 'fire-icon'
-            });
-
-            return L.marker(latlng, {
-                icon: fireIcon
-            });
-        },
+        pointToLayer: createFireMarker,
         onEachFeature: (feature, layer) => {
+            // Bind hover events
+            layer.on('mouseover', () => {
+                const name = feature.properties.Incid_Name || 'Not Available';
+                const acres = feature.properties.BurnBndAc.toLocaleString() || 'Not Available';
+                const fireType = feature.properties.Incid_Type || 'Not Available';
+                tooltip.setContent(`<h3>Name: ${name}</h3> Acres: ${acres}<br>Type: ${fireType}`)
+                       .setLatLng(layer.getLatLng()) // Use layer's latlng
+                       .addTo(map);
+            });
+
+            layer.on('mouseout', () => {
+                tooltip.remove();
+            });
+
+            // Existing popup logic
             if (feature.properties) {
-                // Convert string to Date object
-                const dateString = feature.properties.Ig_Date;
-                const date = new Date(dateString);
-                const formattedDate = date.toLocaleDateString("en-US");  // Output: "7/14/1984"
-                const popupContent = `<h3>Fire Name: ${feature.properties.Incid_Name || 'No Name'}</h3>
-                                      <p>Ignition Date: ${formattedDate}</p>
-                                      <p>Acres Burned: ${feature.properties.BurnBndAc?.toLocaleString()}</p>
-                                      <p>Type of Fire: ${feature.properties.Incid_Type}</p>`;
-                layer.bindPopup(popupContent);
+                layer.bindPopup(createFirePopup(feature));
             }
         }
     }).addTo(map);
 };
+
+const createFireMarker = (feature, latlng) => {
+    const fireType = feature.properties.Incid_Type;
+    const iconUrl = getIconUrlForFireType(fireType);
+    const iconSize = calcPropRadius(feature.properties.BurnBndAc);
+
+    const fireIcon = L.icon({
+        iconUrl: iconUrl,
+        iconSize: [iconSize, iconSize],
+        className: 'fire-icon'
+    });
+
+    return L.marker(latlng, { icon: fireIcon });
+}
+
+const createFirePopup = (feature) => {
+    const dateString = feature.properties.Ig_Date;
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleDateString("en-US");
+
+    return `<h3>Fire Name: ${feature.properties.Incid_Name || 'No Name'}</h3>
+            <p>Ignition Date: ${formattedDate}</p>
+            <p>Acres Burned: ${feature.properties.BurnBndAc?.toLocaleString()}</p>
+            <p>Type of Fire: ${feature.properties.Incid_Type}</p>`;
+}
 
 /**
  * Returns the URL of an icon based on the given fire type.
