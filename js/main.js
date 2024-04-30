@@ -153,12 +153,12 @@ const createMap = (containerId, center, zoom) => {
     // Define regions to create custom zoom control - include center coordinates and zoom levels
     const regions = {
         'us': { tooltip: 'Zoom to Continental United States', center: [39.828, -98.5], zoom: 4 }, // Continental United States
-        'ak': { tooltip: 'Zoom to Alaska', center: [60.67, -151.626], zoom: 4 }, // Alaska
         'pnw': { tooltip: 'Zoom to Pacific Northwest', center: [39.9, -120.5], zoom: 5 }, // Pacific Northwest
         'sw': { tooltip: 'Zoom to Southwest', center: [34.0, -112.0], zoom: 5 }, // Southwest
         'mw': { tooltip: 'Zoom to Midwest', center: [41.0, -93.0], zoom: 5 }, // Midwest
         'ne': { tooltip: 'Zoom to Northeast', center: [43.0, -73.0], zoom: 5 }, // Northeast
-        'se': { tooltip: 'Zoom to Southeast', center: [33.0, -85.0], zoom: 5 } // Southeast
+        'se': { tooltip: 'Zoom to Southeast', center: [33.0, -85.0], zoom: 5 }, // Southeast
+        'ak': { tooltip: 'Zoom to Alaska', center: [60.67, -151.626], zoom: 4 } // Alaska
     };
 
     // Create and add a custom zoom control for each region
@@ -201,11 +201,10 @@ const createMap = (containerId, center, zoom) => {
         ext: 'png'
     }).addTo(map)
 
-// ==================> TODO: UPDATE additional attribution on data change  <=========================================//
     map.attributionControl.addAttribution('Historical fire data &copy; <a href="https://www.mtbs.gov/">Monitoring Trends in Burn Severity</a>');
 
     // Add a scale bar to the map
-    L.control.scale({ position: 'bottomright', metric: false }).addTo(map);
+    L.control.scale({ position: 'bottomleft', metric: false }).addTo(map);
 
     // Initiate the retrieval and display of wildfire points
     loadFireData ();
@@ -240,80 +239,6 @@ const toggleSidePanelAndAdjustMap = (event) => {
         map.setView([40.61063281856264, -122.63627755594064], map.getZoom());
     }, 300); // Adjust timeout duration
 }
-
-
-//====================================================================================================
-//====================================================================================================
-//====================================================================================================
-// TODO: Consolidate functions to update symbols and display
-// const updateMapDisplay = (year) => {
-//     updatePropSymbols(geoJson, "Vandalism_" + year); // Assuming attribute format
-//     updateSliderDisplay(year);
-//     updateTotalVandalismCountDisplay(year);
-//     updateMapDescription(year);
-// }
-//====================================================================================================
-//====================================================================================================
-//====================================================================================================
-
-
-/**
- * Fetches and displays fire boundaries for a specific year.
- * @param {number} year - The year for which to fetch and display fire boundaries.
- * @returns {Promise<void>} - A promise that resolves when the fire boundaries are fetched and displayed.
- */
-const addFireBoundariesByTime = async (year) => {
-    try {
-        const response = await fetch(geoJsonPaths["mtbs-fires-poly"]);
-        const data = await response.json();
-        const filteredData = {
-            type: 'FeatureCollection',
-            features: data.features.filter(feature => Number(feature.properties.StartYear) === year)
-        };
-
-        if (window.geoJsonLayer) {
-            map.removeLayer(window.geoJsonLayer);
-        }
-
-        // Create a new GeoJSON layer with filtered data
-        window.geoJsonLayer = L.geoJSON(filteredData, {
-            style: {
-                color: "#ff7800",
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.1,
-                fillColor: "#87CEFA"
-            },
-            onEachFeature: (feature, layer) => {
-                if (feature.properties) {
-                    // Create an HTML string for the popup content
-                    let popupContent = '<div class="popup-content">';
-                    // Check if FireName exists and add it to the popup
-                    if (feature.properties.FireName) {
-                        popupContent += `<h3>${feature.properties.FireName}</h3>`;
-                    }
-                    // Check if StartYear exists and add it to the popup
-                    if (feature.properties.StartYear) {
-                        popupContent += `<p><strong>Start Year:</strong> ${feature.properties.StartYear}</p>`;
-                    }
-
-                    if (feature.properties.Acres) {
-                        let formattedAcres = Number(feature.properties.Acres).toLocaleString();
-                        popupContent += `<p><strong>Acres Burned:</strong> ${formattedAcres}</p>`;
-                    }
-                    // Close the HTML div tag
-                    popupContent += '</div>';
-                    // Bind the HTML content to the popup
-                    layer.bindPopup(popupContent);
-                }
-            }
-        }).addTo(map);
-        updateYearDisplay(currentYear);
-
-    } catch (error) {
-        console.error('Error loading GeoJSON data:', error);
-    }
-};
 
 
 /**
@@ -365,8 +290,8 @@ const addFireDataToMap = (geojsonData) => {
     if (window.geoJsonLayer) {
         map.removeLayer(window.geoJsonLayer);
     }
-
-    const tooltip = L.tooltip({ sticky: true }); // Create the tooltip here
+    // create the tooltip on hover events
+    const tooltip = L.tooltip({ sticky: true });
 
     window.geoJsonLayer = L.geoJSON(geojsonData, {
         pointToLayer: createFireMarker,
@@ -393,6 +318,12 @@ const addFireDataToMap = (geojsonData) => {
     }).addTo(map);
 };
 
+/**
+ * Creates a fire marker on the map.
+ * @param {Object} feature - The feature object containing properties of the fire.
+ * @param {L.LatLng} latlng - The latitude and longitude coordinates of the fire marker.
+ * @returns {L.Marker} - The fire marker.
+ */
 const createFireMarker = (feature, latlng) => {
     const fireType = feature.properties.Incid_Type;
     const iconUrl = getIconUrlForFireType(fireType);
@@ -407,6 +338,11 @@ const createFireMarker = (feature, latlng) => {
     return L.marker(latlng, { icon: fireIcon });
 }
 
+/**
+ * Creates a fire popup HTML string based on the provided feature.
+ * @param {Object} feature - The feature object containing fire properties.
+ * @returns {string} The HTML string representing the fire popup.
+ */
 const createFirePopup = (feature) => {
     const dateString = feature.properties.Ig_Date;
     const date = new Date(dateString);
@@ -465,7 +401,7 @@ const calcPropRadius = (burnedAcres) => {
  */
 const setupSliderAndButtons = (years) => {
     const slider = document.getElementById('yearSlider');
-    const rangeValueDisplay = document.getElementById('rangeValue');
+    const rangeValueDisplay = document.getElementById('range-value');
     const reverseButton = document.getElementById('reverse');
     const forwardButton = document.getElementById('forward');
 
@@ -475,7 +411,7 @@ const setupSliderAndButtons = (years) => {
     slider.value = 0;  // Default to the first year
     rangeValueDisplay.textContent = years[0];
 
-    // Function to update the slider appearance and value
+     // Function to update the slider appearance and value
     function updateSliderAppearance(index) {
         const percentage = (index / (years.length - 1)) * 100;
         slider.style.background = `linear-gradient(to right, red ${percentage}%, grey ${percentage}%)`;
@@ -535,6 +471,7 @@ const filterMapByYear = (year) => {
             console.error("Error filtering data:", error);
         });
 };
+
 
 /**
  * Function to create a proportional map legend.
@@ -666,7 +603,6 @@ const calculateTotalAcresByYear = (geojsonData) => {
  * @returns {void}
  */
 const updateElementsOnPage = (yearData, year) => {
-    console.log('yearData:', yearData);
     // Check if data for the specific year is available
     if (!yearData[year]) {
         console.error('Data for year', year, 'is not available.');
