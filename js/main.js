@@ -195,11 +195,10 @@ const createMap = (containerId, center, zoom) => {
         map.addControl(new L.Control.RegionButton({ position: 'topleft' }));
     });
 
-    // Add a tile layer to the map using Stadia Maps' Alidade Smooth tiles for terrain visualization
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
-        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        ext: 'png'
-    }).addTo(map)
+    // Add a tile layer to the map using Mapbox's dark basemap tiles for contrast with the wildfire data
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v8/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWxpc3RlcmZ4IiwiYSI6ImNsdmx2ejJ6NjJmYTAycnBodTczcnRsbWQifQ.bZ7LqgToP7GFn2210da3Bg', {
+        attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
     map.attributionControl.addAttribution('Historical fire data &copy; <a href="https://www.mtbs.gov/">Monitoring Trends in Burn Severity</a>');
 
