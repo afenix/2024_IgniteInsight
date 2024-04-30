@@ -48,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const splashScreen = document.getElementById('splash-screen');
     const closeButton = document.getElementById('close-splash');
     const toggleBtn = document.getElementById('toggle-panel-btn');
+    const toggleLegendButton = document.getElementById('toggle-legend-button');
+    const legendContainer = document.querySelector('.legend-container');
+    const yearSlider = document.getElementById('slider');
 
     createMap(mapParams.containerID, mapParams.center, mapParams.zoom);
 
@@ -61,27 +64,35 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 500); // Duration of the fade-out animation
     });
 
-    // Attach the event listener to the toggle button and fire the toggle function when the close button is clicked
+    // Toggle button for the side panel - attach the event listener to the toggle button
+    // and fire the toggle function when the close button is clicked
     toggleBtn.addEventListener('click', toggleSidePanelAndAdjustMap);
 
+    // Check the actual visibility using computed style
+    const legendVisible = window.getComputedStyle(legendContainer).display !== 'none';
+
+    // Set the initial text based on visibility
+    toggleLegendButton.textContent = legendVisible ? 'Close Legend' : 'Open Legend';
+
+    // Toggle function to show/hide the legend and update button text
+    toggleLegendButton.addEventListener('click', () => {
+        const isVisible = window.getComputedStyle(legendContainer).display !== 'none';
+        if (isVisible) {
+            legendContainer.style.display = 'none';
+            toggleLegendButton.textContent = 'Open Legend';
+        } else {
+            legendContainer.style.display = 'block';
+            toggleLegendButton.textContent = 'Close Legend';
+        }
+    });
+
+    // Attach an event listener to the year slider to highlight the corresponding bar chart year when the slider is moved.
+    yearSlider.addEventListener('click', () => {
+        const selectedYear = +document.getElementById('range-value').textContent; // Get year as number
+        highlightBarChartYear(selectedYear);
+    });
+
 });
-
-document.getElementById('toggle-legend').addEventListener('click', function() {
-    var legend = document.querySelector('.legend-container');
-    var button = document.getElementById('toggle-legend');
-
-    // Toggle visibility
-    if (legend.style.display === 'none') {
-        legend.style.display = 'block';
-        button.textContent = 'Close Legend'; // Change button text to indicate action
-    } else {
-        legend.style.display = 'none';
-        button.textContent = 'Open Legend'; // Change button text to indicate action
-    }
-});
-
-// Initialize the legend as visible or hidden based on preference
-document.querySelector('.legend-container').style.display = 'block';
 
 // Function to instantiate the Leaflet map and custom controls
 const createMap = (containerId, center, zoom) => {
@@ -330,15 +341,15 @@ const loadFireData  = async () => {
     try {
         const response = await fetch(geoJsonPaths["mtbs-fires-pts"]);
         const data = await response.json();
-         // 1. Extract unique years and initialize the slider
+         // Extract unique years and initialize the slider
         const uniqueYears = extractUniqueYears(data.features);
         setupSliderAndButtons(uniqueYears);
 
-        // 2. Create line chart data
-        const lineChartData = createLineChartData(data);
-        createLineChart(lineChartData);
+        // Process data for chart ingestion and create the stacked bar chart
+        const lineChartData = createChartData(data);
+        createStackedBarChart(lineChartData);
 
-        // 3. Load the initial year's data
+        // Load the initial year's data
         filterMapByYear(uniqueYears[0]);
 
     } catch (error) {
@@ -512,10 +523,7 @@ const filterMapByYear = (year) => {
             if (window.geoJsonLayer) {
                 map.removeLayer(window.geoJsonLayer);
             }
-// TODO: CONNECT THE CHART WITH THE MAP
-            // Update line chart highlight
-            //highlightYearInChart(year);
-
+            // Add new data to the map
             addFireDataToMap(filteredData);
 
             // Calculate total acres burned for the year
@@ -795,15 +803,15 @@ const closeSidebar = () => {
     activeContent.classList.remove("active-content");
 }
 
-const createLineChartData = (geojsonData) => {
+const createChartData = (geojsonData) => {
     const wildfireData = calculateTotalAcresByYear(geojsonData);
     const data = Object.keys(wildfireData).map(year => ({
-        year: year,
-        totalAcres: wildfireData[year].totalAcres,
-        wildfire: wildfireData[year]['Wildfire'],
-        prescribed: wildfireData[year]['Prescribed Fire'],
-        unknown: wildfireData[year]['Unknown'],
-        wildlandFireUse: wildfireData[year]['Wildland Fire Use'],
+        year: new Date(year, 0, 1),
+        totalAcres: wildfireData[year].totalAcres || 0,
+        wildfire: wildfireData[year]['Wildfire'] || 0,
+        prescribed: wildfireData[year]['Prescribed Fire'] || 0,
+        unknown: wildfireData[year]['Unknown'] || 0,
+        wildlandFireUse: wildfireData[year]['Wildland Fire Use'] || 0,
 
     }));
     return data;
@@ -812,59 +820,126 @@ const createLineChartData = (geojsonData) => {
 
 //-------------------------------------------------------------------------------------------------------------
 
-//-------------------   D3 LINE CHART        -----------------------------------------------------------------
+//-------------------   D3 CHART  -----------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------------------
-const createLineChart = (data) => {
+/**
+ * Creates a stacked bar chart based on the provided data.
+ *
+ * @param {Array} data - The data used to generate the stacked bar chart.
+ */
+const createStackedBarChart = (data) => {
+    // Setup the SVG and its dimensions
     const svg = d3.select('#wildfireChart');
-    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const margin = { top: 20, right: 20, bottom: 30, left: 80 };
     const width = +svg.attr('width') - margin.left - margin.right;
     const height = +svg.attr('height') - margin.top - margin.bottom;
-    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+    const d3Group = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Set the ranges
-    const x = d3.scaleTime().range([0, width]);
-    const y = d3.scaleLinear().range([height, 0]);
+    // Setup the scales
+    const x = d3.scaleTime()
+        .range([0, width])
+        .domain(d3.extent(data, d => d.year));
 
-    // Define the line
-    const line = d3.line()
-        .x(d => x(new Date(d.year, 0, 1)))
-        .y(d => y(d.totalAcres));
-console.log('line', line);
+    const y = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, d3.max(data, d => d.totalAcres)]);
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, d => new Date(d.year, 0, 1)));
-    y.domain([0, d3.max(data, d => d.totalAcres)]);
+    const z = d3.scaleOrdinal()
+        .range(["#e78531", "#f7d664", "#abd037", "#d9dbdb"])
+        .domain(['wildfire', 'prescribed', 'wildlandFireUse', 'unknown']);
 
-    // Add the valueline path.
-    g.append("path")
-        .data([data])
-        .attr("class", "line")
-        .attr("d", line);
+    // Setup the stack function
+    const stack = d3.stack()
+        .keys(['wildfire', 'prescribed', 'wildlandFireUse', 'unknown']);
+
+    // Generate layers
+    const layers = stack(data);
+
+    // Create groups for each series and append rectangles
+    d3Group.selectAll(".serie")
+        .data(layers)
+        .enter().append("g")
+            .attr("class", "serie")
+            .attr("fill", d => z(d.key))
+        .selectAll("rect")
+        .data(d => d)
+        .enter().append("rect")
+            .attr("x", d => x(d.data.year) - (width / data.length) / 2)
+            .attr("y", d => y(d[1]))
+            .attr("height", d => y(d[0]) - y(d[1]))
+            .attr("width", width / data.length)
+            .attr("data-year", d => d.data.year.getFullYear())
+            .on('mouseover', function(d, event) {
+                // Show tooltip
+                d3.select('#chart-tooltip')
+                    .style('left', (event.pageX + 10) + "px")
+                    .style('top', (event.pageY - 20) + "px")
+                    .classed('hidden', false)
+                    .html(`
+                        <h4><strong>${d.data.year.getFullYear()}</strong></h4>
+                        <p><strong>Total Acres:</strong> ${d.data.totalAcres.toLocaleString()}</p>
+                        <p><strong>Wildfire:</strong> ${d.data.wildfire.toLocaleString()}</p>
+                        <p><strong>Prescribed:</strong> ${d.data.prescribed.toLocaleString()}</p>
+                        <p><strong>Wildland Fire Use:</strong> ${d.data.wildlandFireUse.toLocaleString()}</p>
+                        <p><strong>Unknown:</strong> ${d.data.unknown.toLocaleString()}</p>
+                    `);;
+            })
+            .on('mouseout', function() {
+                // Hide the tooltip
+                d3.select('#chart-tooltip').classed('hidden', true);
+            });
 
     // Add the X Axis
-    g.append("g")
+    d3Group.append("g")
+        .attr("class", "axis axis--x")
         .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.timeFormat("%Y")));
+        .call(d3.axisBottom(x).ticks(d3.timeYear.every(10)))
+        .append("text")
+        .text("Years")
+        .attr("text-anchor", "end");
 
     // Add the Y Axis
-    g.append("g")
-        .call(d3.axisLeft(y));
+    d3Group.append("g")
+        .attr("class", "axis axis--y")
+        .attr("transform", "translate(-5,0)")  // Move y-axis 10 pixels to the left
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2s")))
+        .append('text')
+        .text("Burned Acres")
+        .attr("text-anchor", "end");
 };
 
-const highlightYearInChart = (selectedYear) => {
-    g.selectAll(".highlight").remove(); // Remove old highlights
-    g.append("circle") // Add a new highlight
-        .attr("class", "highlight")
-        .attr("cx", x(new Date(selectedYear, 0, 1)))
-        .attr("cy", y(data.find(d => d.year === selectedYear).totalAcres))
-        .attr("r", 5)
-        .style("fill", "red");
-    g.selectAll("dot")
-        .data(data)
-        .enter().append("circle")
-        .attr("r", 5)
-        .attr("cx", d => x(new Date(d.year, 0, 1)))
-        .attr("cy", d => y(d.totalAcres))
-        .on("click", d => updateMapToYear(d.year));
+
+// Prepare a tooltip element
+const tooltip = d3.select('body').append('div')
+    .attr('id', 'chart-tooltip')
+    .attr('class', 'hidden')
+    .style('position', 'absolute')
+    .style('padding', '10px')
+    .style('background', 'white')
+    .style('border', '1px solid black')
+    .style('pointer-events', 'none');
+
+/**
+ * Highlights the bar chart for a specific year.
+ *
+ * @param {number} selectedYear - The year to highlight.
+ * @returns {void}
+ */
+const highlightBarChartYear = (selectedYear) => {
+    const d3Group = d3.select('#wildfireChart g'); // Access d3Group directly
+    // Convert selectedYear to string to ensure proper comparison with data-year attribute
+    selectedYear = String(selectedYear);
+
+    // First, remove the 'highlight' class from all rectangles
+    d3Group.selectAll('rect')
+        .classed('highlight', false)  // Remove the highlight class from all rectangles
+
+    // Find the relevant bar based on the selectedYear using the 'data-year' attribute
+    // Then, add the 'highlight' class only to the rectangles that match the selectedYear
+    d3Group.selectAll('rect')
+        .filter(function() {
+            return d3.select(this).attr("data-year") === selectedYear;
+        })
+        .classed('highlight', true)  // Add the highlight class
 }
