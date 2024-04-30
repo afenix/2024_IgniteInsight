@@ -369,7 +369,7 @@ const getIconUrlForFireType = (fireType) => {
         case 'Unknown':
             return '/img/unknown_igType2.svg';
         case 'Wildland Fire Use':
-            return '/img/beneficialFire_igType2.svg';
+            return '/img/beneficialFire_igType3.svg';
         case 'Outline':
             return '/img/fire_outline.svg';
         default:
@@ -543,7 +543,7 @@ const createCloroplethLegend = () => {
     const classes = [
         { label: 'Wildfire', iconUrl: '/img/wildfire_igType2.svg' },
         { label: 'Prescribed Fire', iconUrl: '/img/prescribedFire_igType2.svg' },
-        { label: 'Wildland Fire Use', iconUrl: '/img/beneficialFire_igType2.svg' },
+        { label: 'Wildland Fire Use', iconUrl: '/img/beneficialFire_igType3.svg' },
         { label: 'Unknown', iconUrl: '/img/unknown_igType2.svg' },
     ];
 

@@ -60,12 +60,12 @@
     <!-- Map Container -->
     <div id="map-container">
         <div id="header-container">
-            <div id="header-text">Year of the Data:</div>
+            <div id="header-text">Year:</div>
             <div id="range-value">2023</div> <!-- This will be dynamically updated -->
         </div>
         <!-- Legend Toggle Button -->
         <div id="legend-toggle" class="legend-toggle">
-            <button id="toggle-legend">Close Legend</button>
+            <button id="toggle-legend-button">Close Legend</button>
         </div>
         <div class="legend-container">
             <div class="columns-wrapper">
@@ -223,7 +223,12 @@
         </symbol>
     </svg>
     <!-- APP DESCRIPTION/ATTRIBUTION  -->
-    <!-- TODO: CHANGE CLASS NAMES -->
+    <div id="mapGuidePopup" class="popup hidden">
+        <span class="close-popup-button" onclick="closePopup()">&times;</span>
+        <h3>Did you know?</h3>
+        <p>There's a Map Guide to help you explore the interactive map! Click here to learn more.</p>
+        <button onclick="openMapGuide()">Open Map Guide</button>
+    </div>
     <div class="sidebar" title="Map Guide">
         <button aria-label="close sidebar" type="button" class="close-button">
             <svg>
@@ -250,6 +255,7 @@
                 <li><strong>Learn about specific fire events</strong> by clicking or hovering on individual fire map
                     markers.
                 </li>
+                <li><strong>Understanding Fire Trends:</strong> Analyze overall fire patterns with the stacked bar chart. Each bar represents a year, and the colored segments show the distribution of wildfire types - such as prescribed burns, natural wildfires, and more.</li>
                 <li><strong>Navigation Controls:</strong> Explore various regions in the U.S. by using the multiple navigation controls on teh left of the map. Clicking on "+" or "-" will zoom in or out of the map. There are also custom regional zoom options for:</li>
                     <ul>
                         <li>
@@ -321,5 +327,7 @@
     <script type="text/javascript" src="https://d3js.org/d3-geo-projection.v3.min.js"></script>
     <script type="text/javascript" defer src="./js/main.js"></script>
 </body>
-
+<footer>
+    <p>&copy; 2023 Alister A. Fenix </p>
+</footer>
 </html>
