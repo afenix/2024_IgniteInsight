@@ -363,17 +363,17 @@ const createFirePopup = (feature) => {
 const getIconUrlForFireType = (fireType) => {
     switch (fireType) {
         case 'Wildfire':
-            return '../img/wildfire_igType2.svg';
+            return 'img/wildfire_igType2.svg';
         case 'Prescribed':
-            return '../img/prescribed_igType2.svg';
+            return 'img/prescribed_igType2.svg';
         case 'Unknown':
-            return '../img/unknown_igType2.svg';
+            return 'img/unknown_igType2.svg';
         case 'Wildland Fire Use':
-            return '../img/beneficialFire_igType3.svg';
+            return 'img/beneficialFire_igType3.svg';
         case 'Outline':
-            return '../img/fire_outline.svg';
+            return 'img/fire_outline.svg';
         default:
-            return '../img/unknown_igType2.svg';
+            return 'img/unknown_igType2.svg';
     }
 }
 
@@ -541,10 +541,10 @@ const createCloroplethLegend = () => {
     legendContainer.appendChild(header);  // Append the header to the container
 
     const classes = [
-        { label: 'Wildfire', iconUrl: '../img/wildfire_igType2.svg' },
-        { label: 'Prescribed Fire', iconUrl: '../img/prescribedFire_igType2.svg' },
-        { label: 'Wildland Fire Use', iconUrl: '../img/beneficialFire_igType3.svg' },
-        { label: 'Unknown', iconUrl: '../img/unknown_igType2.svg' },
+        { label: 'Wildfire', iconUrl: 'img/wildfire_igType2.svg' },
+        { label: 'Prescribed Fire', iconUrl: 'img/prescribedFire_igType2.svg' },
+        { label: 'Wildland Fire Use', iconUrl: 'img/beneficialFire_igType3.svg' },
+        { label: 'Unknown', iconUrl: 'img/unknown_igType2.svg' },
     ];
 
     classes.forEach(cls => {
