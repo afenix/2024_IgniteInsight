@@ -196,9 +196,10 @@ const createMap = (containerId, center, zoom) => {
     });
 
     // Add a tile layer to the map using Stadia Maps' Alidade Smooth tiles for terrain visualization
-    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v8/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWxpc3RlcmZ4IiwiYSI6ImNsdmx2ejJ6NjJmYTAycnBodTczcnRsbWQifQ.bZ7LqgToP7GFn2210da3Bg', {
-        attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        ext: 'png'
+    }).addTo(map)
 
     map.attributionControl.addAttribution('Historical fire data &copy; <a href="https://www.mtbs.gov/">Monitoring Trends in Burn Severity</a>');
 
@@ -362,17 +363,17 @@ const createFirePopup = (feature) => {
 const getIconUrlForFireType = (fireType) => {
     switch (fireType) {
         case 'Wildfire':
-            return '/img/wildfire_igType2.svg';
+            return '../img/wildfire_igType2.svg';
         case 'Prescribed':
-            return '/img/prescribed_igType2.svg';
+            return '../img/prescribed_igType2.svg';
         case 'Unknown':
-            return '/img/unknown_igType2.svg';
+            return '../img/unknown_igType2.svg';
         case 'Wildland Fire Use':
-            return '/img/beneficialFire_igType3.svg';
+            return '../img/beneficialFire_igType3.svg';
         case 'Outline':
-            return '/img/fire_outline.svg';
+            return '../img/fire_outline.svg';
         default:
-            return '/img/unknown_igType2.svg';
+            return '../img/unknown_igType2.svg';
     }
 }
 
@@ -540,10 +541,10 @@ const createCloroplethLegend = () => {
     legendContainer.appendChild(header);  // Append the header to the container
 
     const classes = [
-        { label: 'Wildfire', iconUrl: '/img/wildfire_igType2.svg' },
-        { label: 'Prescribed Fire', iconUrl: '/img/prescribedFire_igType2.svg' },
-        { label: 'Wildland Fire Use', iconUrl: '/img/beneficialFire_igType3.svg' },
-        { label: 'Unknown', iconUrl: '/img/unknown_igType2.svg' },
+        { label: 'Wildfire', iconUrl: '../img/wildfire_igType2.svg' },
+        { label: 'Prescribed Fire', iconUrl: '../img/prescribedFire_igType2.svg' },
+        { label: 'Wildland Fire Use', iconUrl: '../img/beneficialFire_igType3.svg' },
+        { label: 'Unknown', iconUrl: '../img/unknown_igType2.svg' },
     ];
 
     classes.forEach(cls => {
