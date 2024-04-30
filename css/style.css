@@ -768,7 +768,6 @@ svg:not(:root) {
 .legend-container {
     transition: all 0.3s ease; /* Smooth transition for toggling visibility */
     order: 2;
-    display: flex;
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Center items horizontally within the container */
     padding: 20px;
@@ -777,7 +776,8 @@ svg:not(:root) {
     z-index: 1000;
     position: absolute; /* Position it absolutely within its parent */
     bottom: 50px; /* Distance from the bottom edge */
-    right: 20px;  /* Distance from the left edge */
+    right: 20px;  /* Distance from the right edge */
+    display: none; /* Hidden by default */
 }
 
 .legend-toggle {
@@ -787,7 +787,7 @@ svg:not(:root) {
     z-index: 1001; /* Ensure it's above the legend */
 }
 
-#toggle-legend {
+#toggle-legend-button {
     cursor: pointer;
     padding: 5px;
     margin: 5px;
@@ -928,4 +928,66 @@ svg:not(:root) {
 
 .chart-container {
     order: 2;
+    width: max-content;
+}
+
+.axis path,
+.axis line {
+    stroke: white; /* Change color of axes lines and ticks to white */
+}
+
+/* Style for axes text */
+.axis text {
+    fill: white; /* Change color of text to white */
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.highlight {
+    stroke: rgb(243, 243, 236);
+    stroke-width: 2px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+#chart-tooltip {
+    position: absolute;
+    background-color: white;
+    padding: 5px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    font-family: "Reem Kufi Fun", sans-serif;
+    font-size: 12px;
+    bottom: 0;
+    left: 0;
+    width: 150px;
+}
+
+#chart-tooltip h4 {
+    margin: 0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1000; /* Ensure it's on top */
+  }
+
+
+.close-popup-button {
+    float: right;
+    cursor: pointer;
 }
